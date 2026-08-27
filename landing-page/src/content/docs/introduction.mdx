@@ -1,0 +1,33 @@
+---
+title: "Introduction to Project Aeris"
+description: "Zero-dependency single-binary DBMS with an embedded web IDE and auto-generated APIs."
+order: 1
+---
+
+Project Aeris is a lightweight, single-binary Database Management System (DBMS) designed for high-performance engineering, local homelabs, and edge deployments.
+
+## What is Project Aeris?
+
+Traditional database management systems often require heavy external dependencies, complex container setups, or bulky desktop clients. Project Aeris eliminates this complexity by packaging a high-throughput SQL engine, an embedded CodeMirror 6 Web IDE, and auto-generated REST/GraphQL APIs into a **single, zero-dependency executable** under 20MB.
+
+## Core Architectural Pillars
+
+### 1. Single Binary Packaging
+Compiled with Go 1.22+ and `//go:embed`. The entire React Vite frontend is bundled directly inside the compiled Go binary.
+
+### 2. Embedded Web Console
+Instant browser access on startup. Features CodeMirror 6 SQL autocomplete, resizable split panes, and TanStack virtual data grid.
+
+### 3. Modular SQLite Storage
+Pure Go SQLite engine (`modernc.org/sqlite`) with WAL mode and in-memory mode support. Zero CGO compiler dependencies.
+
+### 4. Auto-Generated APIs
+Automatically generates RESTful and GraphQL CRUD endpoints for every user table, plus async HTTP event webhooks.
+
+## Quick Start Example
+
+Launch the server and access the Web IDE immediately:
+
+```bash
+aeris serve --port 8080 --data-dir ./data
+```

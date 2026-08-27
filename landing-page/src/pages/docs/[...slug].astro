@@ -1,0 +1,31 @@
+---
+import { getCollection } from 'astro:content';
+import DocsLayout from '../../components/templates/DocsLayout.astro';
+
+export async function getStaticPaths() {
+  const docsEntries = await getCollection('docs');
+  return docsEntries.map(entry => ({
+    params: { slug: entry.slug },
+    props: { entry }
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await entry.render();
+---
+
+<DocsLayout
+  title={`${entry.data.title} — Project Aeris Docs`}
+  description={entry.data.description}
+  currentPath={`/docs/${entry.slug}`}
+>
+  <article class="prose prose-invert max-w-none space-y-6 font-sans">
+    <div class="border-b border-zinc-800 pb-4 mb-6">
+      <h1 class="text-3xl font-black text-white tracking-tight">{entry.data.title}</h1>
+      {entry.data.description && <p class="text-zinc-400 text-sm font-mono mt-1">{entry.data.description}</p>}
+    </div>
+    <div class="text-zinc-300 text-sm leading-relaxed font-sans space-y-4">
+      <Content />
+    </div>
+  </article>
+</DocsLayout>

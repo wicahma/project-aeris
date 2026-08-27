@@ -1,0 +1,50 @@
+---
+title: "Installation Guide"
+description: "Step-by-step installation instructions for Project Aeris via Shell Script, Homebrew, APT, and Windows Winget."
+order: 2
+---
+
+Choose your preferred distribution channel to install Project Aeris on Linux, macOS, or Windows.
+
+## 1. Shortened Shell Installer (Recommended)
+
+Automated bash script that auto-detects architecture (amd64/arm64), verifies SHA256 checksum, installs binary to `/usr/local/bin/aeris`, and sets up systemd.
+
+```bash
+curl -fsSL https://get.diama.dev/dbms.sh | sh
+```
+
+## 2. Homebrew Tap (macOS & Linux)
+
+Official Homebrew Tap formula for Apple Silicon & Intel macOS.
+
+```bash
+brew install wicahma/tap/dbms
+```
+
+## 3. Debian/Ubuntu APT Repository
+
+Official APT repository with GPG package signing and native systemd service integration.
+
+```bash
+# Add GPG Key
+curl -fsSL https://apt.diama.dev/gpg.key | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/dbms.gpg
+
+# Add APT Repository & Install
+echo "deb [signed-by=/etc/apt/trusted.gpg.d/dbms.gpg] https://apt.diama.dev/ stable main" | sudo tee /etc/apt/sources.list.d/dbms.list
+sudo apt update && sudo apt install dbms
+```
+
+## 4. Windows Winget & Chocolatey
+
+Install via Windows Package Manager or Chocolatey Gallery.
+
+```powershell
+winget install wicahma.dbms
+```
+
+---
+
+### To Be Continued...
+
+Advanced configuration options, custom build flags, Docker containers, and Offline Air-Gapped installation guides will be detailed in upcoming releases.
