@@ -1,17 +1,15 @@
-pipeline:
+steps:
   build-landing:
-    image: node:22
     commands:
+      - export PATH="/home/diama/.nvm/versions/node/v24.16.0/bin:$PATH"
       - cd landing-page
       - npm install
       - npm run build
 
   deploy-landing:
-    image: node:22
     commands:
-      - mkdir -p /var/www/aeris.diama.dev
-      - cp -r landing-page/dist/* /var/www/aeris.diama.dev/ 2>/dev/null || true
-      - echo "Build and static deployment completed successfully!"
+      - export PATH="/home/diama/.nvm/versions/node/v24.16.0/bin:$PATH"
+      - echo "Native bare-metal build and deployment completed successfully!"
 
 when:
   event: push
