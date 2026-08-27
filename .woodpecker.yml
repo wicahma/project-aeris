@@ -1,15 +1,20 @@
+labels:
+  backend: local
+
 steps:
-  build-landing:
+  - name: build-landing
+    image: bash
     commands:
       - export PATH="/home/diama/.nvm/versions/node/v24.16.0/bin:$PATH"
       - cd landing-page
       - npm install
       - npm run build
 
-  deploy-landing:
+  - name: deploy-landing
+    image: bash
     commands:
       - export PATH="/home/diama/.nvm/versions/node/v24.16.0/bin:$PATH"
-      - echo "Native bare-metal build and deployment completed successfully!"
+      - echo "Native bare-metal build completed!"
 
 when:
   event: push
