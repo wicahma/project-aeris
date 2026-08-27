@@ -20,8 +20,10 @@ steps:
     image: bash
     commands:
       - export PATH="/home/diama/.nvm/versions/node/v24.16.0/bin:$PATH"
+      - chmod -R u+w /home/diama/repos/project-aeris/landing-page/dist 2>/dev/null || true
+      - rm -rf /home/diama/repos/project-aeris/landing-page/dist/* 2>/dev/null || true
       - mkdir -p /home/diama/repos/project-aeris/landing-page/dist
-      - cp -r landing-page/dist/* /home/diama/repos/project-aeris/landing-page/dist/
+      - cp -rf landing-page/dist/* /home/diama/repos/project-aeris/landing-page/dist/
       - echo "Production static assets synced to live server path successfully!"
 
 when:
