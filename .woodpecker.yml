@@ -1,3 +1,9 @@
+clone:
+  git:
+    image: bash
+    settings:
+      lfs: false
+
 labels:
   backend: local
 
