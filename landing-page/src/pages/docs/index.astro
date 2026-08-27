@@ -1,0 +1,55 @@
+---
+import LandingLayout from '../../components/templates/LandingLayout.astro';
+import { CodeBlock } from '../../components/atoms/CodeBlock';
+import { Button } from '../../components/atoms/Button';
+import { ArrowLeft, BookOpen, Terminal, Shield } from 'lucide-react';
+---
+
+<LandingLayout title="Documentation — Project Aeris" description="Official documentation and CLI reference for Project Aeris.">
+  <div class="pt-28 pb-20 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 font-sans">
+    <div class="mb-8">
+      <Button href="/" variant="outline" size="sm" className="gap-2 mb-6">
+        <ArrowLeft className="w-4 h-4" />
+        <span>Back to Landing Page</span>
+      </Button>
+
+      <div class="flex items-center gap-2 mb-2">
+        <BookOpen className="w-6 h-6 text-brand-primary" />
+        <h1 class="text-3xl font-black text-white">Project Aeris Documentation</h1>
+      </div>
+      <p class="text-dark-muted text-sm font-mono">Official guide, CLI subcommand reference, and architecture specs.</p>
+    </div>
+
+    <div class="space-y-10 text-zinc-300 leading-relaxed font-sans border-t border-zinc-800 pt-8">
+      <section class="space-y-4">
+        <h2 class="text-xl font-bold text-white font-mono flex items-center gap-2">
+          <Terminal className="w-5 h-5 text-brand-accent" />
+          <span>1. Installation & CLI Commands</span>
+        </h2>
+        <p className="text-sm">Install Project Aeris using the one-line shell script or package managers.</p>
+        <CodeBlock code="curl -fsSL https://get.diama.dev/dbms.sh | sh" language="bash" client:load />
+        
+        <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 font-mono text-xs space-y-2">
+          <div className="text-white font-bold">Supported Subcommands:</div>
+          <div className="text-zinc-400"><span className="text-brand-primary font-bold">aeris serve</span> -- Run database server & web console</div>
+          <div className="text-zinc-400"><span className="text-brand-primary font-bold">aeris init [name]</span> -- Create new .db database file</div>
+          <div className="text-zinc-400"><span className="text-brand-primary font-bold">aeris config set [key] [val]</span> -- Modify global settings</div>
+          <div className="text-zinc-400"><span className="text-brand-primary font-bold">aeris user add --username admin</span> -- Manage RBAC users</div>
+          <div className="text-zinc-400"><span className="text-brand-primary font-bold">aeris service install</span> -- Register systemd daemon</div>
+        </div>
+      </section>
+
+      <section class="space-y-4 border-t border-zinc-800 pt-8">
+        <h2 class="text-xl font-bold text-white font-mono flex items-center gap-2">
+          <Shield className="w-5 h-5 text-brand-primary" />
+          <span>2. Architecture Overview</span>
+        </h2>
+        <p className="text-sm">
+          Project Aeris is built in Golang using standard library <code class="text-brand-accent font-mono">net/http</code>, 
+          pure Go SQLite (<code class="text-brand-accent font-mono">modernc.org/sqlite</code>), and <code class="text-brand-accent font-mono">//go:embed</code> 
+          for bundling Vite static assets directly into a single binary.
+        </p>
+      </section>
+    </div>
+  </div>
+</LandingLayout>

@@ -1,0 +1,17 @@
+pipeline:
+  build:
+    image: node:24-alpine
+    commands:
+      - npm ci
+      - npm run build
+
+  deploy:
+    image: alpine
+    commands:
+      - mkdir -p /var/www/aeris.diama.dev
+      - cp -r dist/* /var/www/aeris.diama.dev/
+      - systemctl reload aeris-landing.service || true
+
+when:
+  event: push
+  branch: main

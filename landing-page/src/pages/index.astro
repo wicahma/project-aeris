@@ -1,0 +1,16 @@
+---
+import LandingLayout from '../components/templates/LandingLayout.astro';
+import { HeroSection } from '../components/organisms/HeroSection';
+import { ValueProposition } from '../components/organisms/ValueProposition';
+import { MockupShowcase } from '../components/organisms/MockupShowcase';
+import { QuickStart } from '../components/organisms/QuickStart';
+import { BenchmarksSpecs } from '../components/organisms/BenchmarksSpecs';
+---
+
+<LandingLayout title="Project Aeris — Zero-Dependency Drop-in Database">
+  <HeroSection client:load />
+  <ValueProposition client:visible />
+  <MockupShowcase client:visible />
+  <QuickStart client:visible />
+  <BenchmarksSpecs client:visible />
+</LandingLayout>

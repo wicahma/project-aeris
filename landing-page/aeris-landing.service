@@ -1,0 +1,15 @@
+[Unit]
+Description=Project Aeris Landing Page Web Service
+After=network.target
+
+[Service]
+Type=simple
+User=diama
+WorkingDirectory=/var/www/aeris.diama.dev
+ExecStart=/home/diama/.nvm/versions/node/v24.16.0/bin/npx serve -s /var/www/aeris.diama.dev -p 8085
+Restart=always
+RestartSec=5
+Environment=NODE_ENV=production
+
+[Install]
+WantedBy=multi-user.target
