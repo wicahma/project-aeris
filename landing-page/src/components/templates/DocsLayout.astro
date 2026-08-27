@@ -1,0 +1,69 @@
+---
+import { DocsSidebar } from '../organisms/DocsSidebar';
+import { DocsSearchModal } from '../organisms/DocsSearchModal';
+import { Footer } from '../organisms/Footer';
+
+interface Props {
+  title?: string;
+  description?: string;
+  currentPath?: string;
+}
+
+const {
+  title = 'Documentation — Project Aeris',
+  description = 'Official documentation and architecture guide for Project Aeris.',
+  currentPath = '/docs/introduction'
+} = Astro.props;
+---
+
+<!usr/bin/env html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+
+    <title>{title}</title>
+    <meta name="description" content={description} />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  </head>
+  <body class="bg-dark-bg text-zinc-100 font-sans antialiased selection:bg-brand-primary selection:text-white">
+    <header class="fixed top-0 left-0 right-0 z-40 bg-dark-bg/80 backdrop-blur-md border-b border-dark-border">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+        <div class="flex items-center space-x-6">
+          <a href="/" class="flex items-center space-x-2 font-mono font-bold text-lg text-white">
+            <span className="text-xl">🚀</span>
+            <span>Project Aeris</span>
+          </a>
+          <span class="text-zinc-600 font-mono text-sm">/</span>
+          <a href="/docs/introduction" class="font-mono text-xs text-brand-primary font-bold">Docs</a>
+        </div>
+
+        <div class="flex items-center space-x-4">
+          <DocsSearchModal client:load />
+          <a href="https://github.com/wicahma/project-aeris" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 font-mono text-xs font-semibold bg-zinc-900 border border-zinc-700 hover:border-brand-primary text-white rounded transition-colors">
+            GitHub ★
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <div class="pt-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex gap-8">
+      <div class="hidden md:block py-8 border-r border-zinc-800 pr-6 shrink-0">
+        <div class="sticky top-24">
+          <DocsSidebar currentPath={currentPath} client:load />
+        </div>
+      </div>
+
+      <main class="flex-1 py-8 max-w-4xl min-w-0">
+        <slot />
+      </main>
+    </div>
+
+    <Footer client:visible />
+  </body>
+</html>
