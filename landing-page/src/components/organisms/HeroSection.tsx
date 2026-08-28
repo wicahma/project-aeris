@@ -17,7 +17,7 @@ export const HeroSection: React.FC = () => {
             
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-black font-sans text-white tracking-tighter leading-none uppercase">
               Zero-Dependency <br />
-              <span className="text-indigo-500 bg-indigo-950/40 px-2 border-l-4 border-emerald-400 inline-block mt-1">
+              <span className="text-indigo-400 bg-indigo-950/80 px-3 py-1 border-2 border-indigo-500/40 inline-block mt-2">
                 Drop-in Database.
               </span>
             </h1>

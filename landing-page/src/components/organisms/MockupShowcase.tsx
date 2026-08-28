@@ -129,9 +129,15 @@ export const MockupShowcase: React.FC = () => {
                         <td className="py-2 px-3 text-zinc-400">{row.email}</td>
                         <td className="py-2 px-3">{row.role}</td>
                         <td className="py-2 px-3">
-                          <span className={`px-1.5 py-0.5 rounded text-[10px] ${row.status === 'active' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-zinc-800 text-zinc-400'}`}>
-                            {row.status}
-                          </span>
+                          {row.status === 'active' ? (
+                            <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-950 text-emerald-300 border border-emerald-500/40">
+                              {row.status}
+                            </span>
+                          ) : (
+                            <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-zinc-900 text-zinc-300 border border-zinc-700">
+                              {row.status}
+                            </span>
+                          )}
                         </td>
                       </tr>
                     ))}

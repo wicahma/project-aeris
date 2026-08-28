@@ -18,9 +18,9 @@ export const Button: React.FC<ButtonProps> = ({
   const baseStyles = 'inline-flex items-center justify-center font-mono font-bold uppercase tracking-wider transition-all duration-150 border-2 select-none active:translate-x-0.5 active:translate-y-0.5';
   
   const variants = {
-    primary: 'bg-indigo-600 text-white border-zinc-100 shadow-[4px_4px_0px_0px_#ffffff] hover:-translate-y-0.5 hover:-translate-x-0.5 hover:shadow-[6px_6px_0px_0px_#ffffff]',
-    secondary: 'bg-emerald-500 text-zinc-950 border-zinc-100 shadow-[4px_4px_0px_0px_#10b981] hover:-translate-y-0.5 hover:-translate-x-0.5 hover:shadow-[6px_6px_0px_0px_#10b981]',
-    outline: 'bg-zinc-900 text-zinc-100 border-zinc-700 shadow-[4px_4px_0px_0px_#3f3f46] hover:border-indigo-500 hover:text-indigo-400 hover:-translate-y-0.5 hover:-translate-x-0.5',
+    primary: 'bg-indigo-600 text-white border-white shadow-[4px_4px_0px_0px_#ffffff] hover:-translate-y-0.5 hover:-translate-x-0.5 hover:shadow-[6px_6px_0px_0px_#ffffff]',
+    secondary: 'bg-emerald-500 text-emerald-950 border-white shadow-[4px_4px_0px_0px_#10b981] hover:-translate-y-0.5 hover:-translate-x-0.5 hover:shadow-[6px_6px_0px_0px_#10b981]',
+    outline: 'bg-zinc-900 text-white border-zinc-700 shadow-[4px_4px_0px_0px_#3f3f46] hover:border-indigo-500 hover:text-indigo-400 hover:-translate-y-0.5 hover:-translate-x-0.5',
     ghost: 'bg-transparent text-zinc-400 hover:text-white border-transparent hover:border-zinc-700'
   };
 
