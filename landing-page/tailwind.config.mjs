@@ -6,7 +6,7 @@ export default {
       colors: {
         dark: {
           bg: '#09090b',
-          card: '#18181b',
+          card: '#121215',
           border: '#27272a',
           muted: '#a1a1aa'
         },
@@ -18,12 +18,8 @@ export default {
       },
       fontFamily: {
         mono: ['JetBrains Mono', 'Fira Code', 'monospace'],
-        sans: ['Inter', 'Plus Jakarta Sans', 'sans-serif']
-      },
-      boxShadow: {
-        neubrutalism: '4px 4px 0px 0px #6366f1',
-        'neubrutalism-green': '4px 4px 0px 0px #10b981',
-        'neubrutalism-dark': '4px 4px 0px 0px #27272a'
+        display: ['Cabinet Grotesk', 'Plus Jakarta Sans', 'sans-serif'],
+        sans: ['Plus Jakarta Sans', 'Inter', 'sans-serif']
       }
     }
   },

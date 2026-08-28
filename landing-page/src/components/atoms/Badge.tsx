@@ -7,14 +7,14 @@ interface BadgeProps {
 
 export const Badge: React.FC<BadgeProps> = ({ children, variant = 'indigo' }) => {
   const variants = {
-    indigo: 'bg-indigo-950/80 text-indigo-400 border-indigo-500/50',
-    emerald: 'bg-emerald-950/80 text-emerald-400 border-emerald-500/50',
-    amber: 'bg-amber-950/80 text-amber-400 border-amber-500/50',
-    zinc: 'bg-zinc-900 text-zinc-300 border-zinc-700'
+    indigo: 'bg-indigo-950/60 text-indigo-300 border-indigo-500/30',
+    emerald: 'bg-emerald-950/60 text-emerald-300 border-emerald-500/30',
+    amber: 'bg-amber-950/60 text-amber-300 border-amber-500/30',
+    zinc: 'bg-zinc-900 text-zinc-300 border-zinc-800'
   };
 
   return (
-    <span className={`inline-flex items-center px-2.5 py-0.5 text-[11px] font-mono font-bold tracking-wider uppercase border-2 ${variants[variant]}`}>
+    <span className={`inline-flex items-center px-3 py-1 text-[11px] font-mono font-medium border rounded-full ${variants[variant]}`}>
       {children}
     </span>
   );

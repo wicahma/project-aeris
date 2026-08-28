@@ -12,31 +12,31 @@ export const BenchmarksSpecs: React.FC = () => {
   ];
 
   return (
-    <section id="benchmarks" className="py-20 border-b border-dark-border bg-zinc-950">
+    <section id="benchmarks" className="py-20 md:py-28 border-b border-zinc-800/80 bg-zinc-950">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto mb-12 space-y-3">
-          <h2 className="text-xs font-mono font-bold tracking-widest text-brand-accent uppercase">
+          <h2 className="text-xs font-mono font-semibold tracking-widest text-emerald-400 uppercase">
             Technical Efficiency
           </h2>
-          <p className="text-3xl font-black font-sans text-white">
+          <p className="text-3xl sm:text-4xl font-bold font-display text-white tracking-tight">
             Unmatched Performance & Footprint.
           </p>
-          <p className="text-sm text-dark-muted">
+          <p className="text-sm text-zinc-400">
             Engineered to run natively on resource-constrained homelab hardware or high-throughput servers.
           </p>
         </div>
 
-        <div className="max-w-4xl mx-auto bg-dark-bg border-2 border-zinc-700 rounded-xl overflow-hidden shadow-neubrutalism">
+        <div className="max-w-4xl mx-auto bg-zinc-900/40 border border-zinc-800 rounded-2xl overflow-hidden shadow-xl">
           <div className="overflow-x-auto">
             <table className="w-full text-left">
-              <thead className="bg-zinc-900 border-b border-zinc-700 font-mono text-xs uppercase tracking-wider text-zinc-400">
+              <thead className="bg-zinc-900/80 border-b border-zinc-800 font-mono text-xs uppercase tracking-wider text-zinc-400">
                 <tr>
-                  <th className="py-3.5 px-4">Metric / Specification</th>
-                  <th className="py-3.5 px-4 text-brand-accent">Project Aeris</th>
-                  <th className="py-3.5 px-4 text-dark-muted">Traditional Tools</th>
+                  <th className="py-4 px-6">Metric / Specification</th>
+                  <th className="py-4 px-6 text-emerald-400 font-bold">Project Aeris</th>
+                  <th className="py-4 px-6 text-zinc-400">Traditional Tools</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-zinc-800">
+              <tbody className="divide-y divide-zinc-800/60">
                 {specs.map((spec, idx) => (
                   <SpecRow key={idx} {...spec} />
                 ))}

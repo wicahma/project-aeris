@@ -31,16 +31,16 @@ export const ValueProposition: React.FC = () => {
   ];
 
   return (
-    <section id="features" className="py-20 border-b border-dark-border bg-dark-bg">
+    <section id="features" className="py-20 md:py-28 border-b border-zinc-800/80 bg-zinc-950">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
-          <h2 className="text-xs font-mono font-bold tracking-widest text-brand-primary uppercase">
+          <h2 className="text-xs font-mono font-semibold tracking-widest text-indigo-400 uppercase">
             Built for High-Performance Engineering
           </h2>
-          <p className="text-3xl sm:text-4xl font-black font-sans text-white">
+          <p className="text-3xl sm:text-4xl font-bold font-display text-white tracking-tight">
             Everything You Need in One Executable.
           </p>
-          <p className="text-base text-dark-muted font-sans">
+          <p className="text-sm sm:text-base text-zinc-400 font-sans">
             Designed from the ground up for minimal overhead, extreme speed, and developer joy.
           </p>
         </div>

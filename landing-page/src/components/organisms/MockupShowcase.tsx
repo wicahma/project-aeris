@@ -11,13 +11,13 @@ export const MockupShowcase: React.FC = () => {
   ];
 
   return (
-    <section id="demo" className="py-16 md:py-24 border-b border-zinc-800 bg-zinc-950">
+    <section id="demo" className="py-20 md:py-28 border-b border-zinc-800/80 bg-zinc-950">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto mb-12 space-y-3">
-          <h2 className="text-xs font-mono font-bold tracking-widest text-emerald-400 uppercase">
+          <h2 className="text-xs font-mono font-semibold tracking-widest text-emerald-400 uppercase">
             Interactive Interface Showcase
           </h2>
-          <p className="text-2xl sm:text-4xl font-black font-sans text-white uppercase tracking-tight">
+          <p className="text-3xl sm:text-4xl font-bold font-display text-white tracking-tight">
             Clean, IDE-Grade Web Console.
           </p>
           <p className="text-sm text-zinc-400">
@@ -25,10 +25,10 @@ export const MockupShowcase: React.FC = () => {
           </p>
         </div>
 
-        <div className="bg-zinc-950 border border-zinc-800 rounded-xl overflow-hidden shadow-2xl">
-          <div className="bg-zinc-900 px-4 py-3 border-b border-zinc-800 flex flex-wrap items-center justify-between gap-3">
+        <div className="bg-zinc-900/60 border border-zinc-800 rounded-2xl overflow-hidden shadow-xl">
+          <div className="bg-zinc-900 px-4 py-3 border-b border-zinc-800/80 flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center space-x-3 overflow-x-auto">
-              <span className="font-mono text-xs font-bold text-indigo-400 flex items-center gap-1.5 shrink-0">
+              <span className="font-mono text-xs font-semibold text-indigo-400 flex items-center gap-1.5 shrink-0">
                 <Database className="w-4 h-4" />
                 <span>aeris://production.db</span>
               </span>
@@ -36,34 +36,34 @@ export const MockupShowcase: React.FC = () => {
               <div className="flex space-x-1 shrink-0">
                 <button
                   onClick={() => setActiveTab('editor')}
-                  className={`px-3 py-1 text-xs font-mono rounded transition-colors ${activeTab === 'editor' ? 'bg-zinc-800 text-white font-bold border border-zinc-700' : 'text-zinc-400 hover:text-white'}`}
+                  className={`px-3 py-1 text-xs font-mono rounded-md transition-colors ${activeTab === 'editor' ? 'bg-zinc-800 text-white font-semibold border border-zinc-700' : 'text-zinc-400 hover:text-white'}`}
                 >
                   query_users.sql
                 </button>
                 <button
                   onClick={() => setActiveTab('data')}
-                  className={`px-3 py-1 text-xs font-mono rounded transition-colors ${activeTab === 'data' ? 'bg-zinc-800 text-white font-bold border border-zinc-700' : 'text-zinc-400 hover:text-white'}`}
+                  className={`px-3 py-1 text-xs font-mono rounded-md transition-colors ${activeTab === 'data' ? 'bg-zinc-800 text-white font-semibold border border-zinc-700' : 'text-zinc-400 hover:text-white'}`}
                 >
                   Data Grid
                 </button>
                 <button
                   onClick={() => setActiveTab('explain')}
-                  className={`px-3 py-1 text-xs font-mono rounded transition-colors ${activeTab === 'explain' ? 'bg-zinc-800 text-white font-bold border border-zinc-700' : 'text-zinc-400 hover:text-white'}`}
+                  className={`px-3 py-1 text-xs font-mono rounded-md transition-colors ${activeTab === 'explain' ? 'bg-zinc-800 text-white font-semibold border border-zinc-700' : 'text-zinc-400 hover:text-white'}`}
                 >
                   Explain Plan
                 </button>
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <span className="inline-flex items-center gap-1 text-[11px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+              <span className="inline-flex items-center gap-1 text-[11px] font-mono text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/20">
                 <CheckCircle2 className="w-3 h-3" /> 1.2ms
               </span>
             </div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 min-h-[380px]">
-            <div className="lg:col-span-3 bg-zinc-900/50 p-4 border-b lg:border-b-0 lg:border-r border-zinc-800 font-mono text-xs text-zinc-400 space-y-3">
-              <div className="font-bold text-zinc-200 flex items-center gap-1.5 uppercase tracking-wider text-[11px]">
+            <div className="lg:col-span-3 bg-zinc-950/60 p-4 border-b lg:border-b-0 lg:border-r border-zinc-800/80 font-mono text-xs text-zinc-400 space-y-3">
+              <div className="font-semibold text-zinc-200 flex items-center gap-1.5 uppercase tracking-wider text-[11px]">
                 <Layers className="w-4 h-4 text-indigo-400" />
                 <span>Schemas</span>
               </div>
@@ -84,7 +84,7 @@ export const MockupShowcase: React.FC = () => {
             <div className="lg:col-span-9 p-4 flex flex-col justify-between font-mono">
               {activeTab === 'editor' && (
                 <div className="space-y-4">
-                  <div className="bg-zinc-900 p-4 rounded-lg border border-zinc-800 space-y-1 text-xs sm:text-sm">
+                  <div className="bg-zinc-950 p-4 rounded-xl border border-zinc-800 space-y-1 text-xs sm:text-sm">
                     <div className="text-purple-400 font-semibold">
                       SELECT <span className="text-white">id, name, email, role, status, created_at</span>
                     </div>
@@ -101,10 +101,10 @@ export const MockupShowcase: React.FC = () => {
 
                   <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
                     <div className="flex items-center gap-2">
-                      <button className="flex items-center gap-1.5 bg-indigo-600 text-white text-xs px-3 py-1.5 rounded font-bold shadow-sm hover:bg-indigo-500 transition-colors">
+                      <button className="flex items-center gap-1.5 bg-indigo-600 text-white text-xs px-3.5 py-1.5 rounded-lg font-medium shadow-sm hover:bg-indigo-500 transition-colors">
                         <Play className="w-3.5 h-3.5 fill-current" /> Execute (Cmd+Enter)
                       </button>
-                      <button className="flex items-center gap-1 text-zinc-300 text-xs px-2.5 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 transition-colors">
+                      <button className="flex items-center gap-1 text-zinc-300 text-xs px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 transition-colors">
                         <Sparkles className="w-3.5 h-3.5 text-emerald-400" /> Format
                       </button>
                     </div>
@@ -114,8 +114,8 @@ export const MockupShowcase: React.FC = () => {
               )}
 
               {activeTab === 'explain' && (
-                <div className="bg-zinc-900 p-4 rounded-lg border border-zinc-800 space-y-3 text-xs">
-                  <div className="flex items-center gap-2 text-indigo-400 font-bold uppercase tracking-wider">
+                <div className="bg-zinc-950 p-4 rounded-xl border border-zinc-800 space-y-3 text-xs">
+                  <div className="flex items-center gap-2 text-indigo-400 font-semibold uppercase tracking-wider">
                     <Activity className="w-4 h-4" />
                     <span>Explain Plan Tree Visualizer</span>
                   </div>
@@ -127,9 +127,9 @@ export const MockupShowcase: React.FC = () => {
                 </div>
               )}
 
-              <div className="mt-4 border border-zinc-800 rounded-lg overflow-x-auto">
+              <div className="mt-4 border border-zinc-800 rounded-xl overflow-x-auto bg-zinc-950">
                 <table className="w-full text-left text-xs font-mono min-w-[500px]">
-                  <thead className="bg-zinc-900 text-zinc-300 border-b border-zinc-800">
+                  <thead className="bg-zinc-900/80 text-zinc-300 border-b border-zinc-800">
                     <tr>
                       <th className="py-2.5 px-3">id</th>
                       <th className="py-2.5 px-3">name</th>
@@ -138,20 +138,20 @@ export const MockupShowcase: React.FC = () => {
                       <th className="py-2.5 px-3">status</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-zinc-800 text-zinc-200">
+                  <tbody className="divide-y divide-zinc-800/80 text-zinc-200">
                     {mockData.map(row => (
                       <tr key={row.id} className="hover:bg-zinc-900/50">
-                        <td className="py-2.5 px-3 font-bold text-indigo-400">{row.id}</td>
+                        <td className="py-2.5 px-3 font-semibold text-indigo-400">{row.id}</td>
                         <td className="py-2.5 px-3">{row.name}</td>
                         <td className="py-2.5 px-3 text-zinc-400">{row.email}</td>
                         <td className="py-2.5 px-3">{row.role}</td>
                         <td className="py-2.5 px-3">
                           {row.status === 'active' ? (
-                            <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-950 text-emerald-300 border border-emerald-500/40">
+                            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-950/80 text-emerald-300 border border-emerald-500/40">
                               {row.status}
                             </span>
                           ) : (
-                            <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-zinc-900 text-zinc-300 border border-zinc-700">
+                            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-zinc-900 text-zinc-300 border border-zinc-800">
                               {row.status}
                             </span>
                           )}

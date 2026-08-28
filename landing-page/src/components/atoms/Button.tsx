@@ -15,19 +15,19 @@ export const Button: React.FC<ButtonProps> = ({
   className = '',
   ...props
 }) => {
-  const baseStyles = 'inline-flex items-center justify-center font-mono font-bold uppercase tracking-wider transition-all duration-150 border-2 select-none active:translate-x-0.5 active:translate-y-0.5';
+  const baseStyles = 'inline-flex items-center justify-center font-mono font-medium transition-all duration-200 rounded-lg select-none active:scale-[0.98]';
   
   const variants = {
-    primary: 'bg-indigo-600 text-white border-white shadow-[4px_4px_0px_0px_#ffffff] hover:-translate-y-0.5 hover:-translate-x-0.5 hover:shadow-[6px_6px_0px_0px_#ffffff]',
-    secondary: 'bg-emerald-500 text-emerald-950 border-white shadow-[4px_4px_0px_0px_#10b981] hover:-translate-y-0.5 hover:-translate-x-0.5 hover:shadow-[6px_6px_0px_0px_#10b981]',
-    outline: 'bg-zinc-900 text-white border-zinc-700 shadow-[4px_4px_0px_0px_#3f3f46] hover:border-indigo-500 hover:text-indigo-400 hover:-translate-y-0.5 hover:-translate-x-0.5',
-    ghost: 'bg-transparent text-zinc-400 hover:text-white border-transparent hover:border-zinc-700'
+    primary: 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-sm hover:shadow-indigo-500/25 border border-indigo-500/30',
+    secondary: 'bg-emerald-500 hover:bg-emerald-400 text-zinc-950 shadow-sm font-semibold border border-emerald-400/40',
+    outline: 'bg-zinc-900/80 hover:bg-zinc-800 text-zinc-100 border border-zinc-800 hover:border-zinc-700 shadow-sm',
+    ghost: 'bg-transparent text-zinc-400 hover:text-white hover:bg-zinc-900/50'
   };
 
   const sizes = {
-    sm: 'px-3 py-1.5 text-xs gap-1.5',
-    md: 'px-5 py-2.5 text-xs sm:text-sm gap-2',
-    lg: 'px-7 py-3.5 text-sm sm:text-base gap-2.5'
+    sm: 'px-3.5 py-1.5 text-xs gap-1.5',
+    md: 'px-4.5 py-2.5 text-xs sm:text-sm gap-2',
+    lg: 'px-6 py-3 text-sm sm:text-base gap-2.5'
   };
 
   const combinedClasses = `${baseStyles} ${variants[variant]} ${sizes[size]} ${className}`;

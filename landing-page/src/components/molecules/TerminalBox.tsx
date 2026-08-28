@@ -33,14 +33,14 @@ export const TerminalBox: React.FC = () => {
   }, []);
 
   return (
-    <div className="w-full bg-zinc-950 border border-zinc-800 rounded-xl overflow-hidden font-mono text-xs md:text-sm shadow-xl">
-      <div className="bg-zinc-900 px-4 py-3 border-b border-zinc-800 flex items-center justify-between">
+    <div className="w-full bg-zinc-950 border border-zinc-800 rounded-2xl overflow-hidden font-mono text-xs md:text-sm">
+      <div className="bg-zinc-900/80 px-4 py-3 border-b border-zinc-800/80 flex items-center justify-between">
         <div className="flex items-center space-x-2">
           <div className="w-3 h-3 rounded-full bg-rose-500/80"></div>
           <div className="w-3 h-3 rounded-full bg-amber-500/80"></div>
           <div className="w-3 h-3 rounded-full bg-emerald-500/80"></div>
         </div>
-        <div className="text-zinc-400 text-xs font-bold uppercase tracking-wider">
+        <div className="text-zinc-400 text-xs font-mono font-medium">
           aeris-terminal
         </div>
       </div>
