@@ -6,7 +6,7 @@ import { Download, BookOpen, ArrowRight } from 'lucide-react';
 
 export const HeroSection: React.FC = () => {
   return (
-    <section className="relative pt-24 pb-16 md:pt-36 md:pb-24 border-b-2 border-zinc-800 overflow-hidden bg-zinc-950">
+    <section className="relative pt-24 pb-16 md:pt-36 md:pb-24 border-b border-zinc-800 overflow-hidden bg-zinc-950">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           <div className="lg:col-span-7 space-y-6">
@@ -17,7 +17,7 @@ export const HeroSection: React.FC = () => {
             
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-black font-sans text-white tracking-tighter leading-none uppercase">
               Zero-Dependency <br />
-              <span className="text-indigo-400 bg-indigo-950/80 px-3 py-1 border-2 border-indigo-500/40 inline-block mt-2">
+              <span className="text-indigo-400 bg-indigo-950/80 px-3 py-1 border border-indigo-500/40 inline-block mt-2">
                 Drop-in Database.
               </span>
             </h1>
@@ -27,7 +27,7 @@ export const HeroSection: React.FC = () => {
             </p>
 
             <div className="flex flex-wrap items-center gap-4 pt-4">
-              <Button href="#download" variant="primary" size="lg" className="gap-2">
+              <Button href="#quickstart" variant="primary" size="lg" className="gap-2">
                 <Download className="w-5 h-5" />
                 <span>Download Aeris</span>
               </Button>
@@ -40,15 +40,15 @@ export const HeroSection: React.FC = () => {
 
             <div className="pt-6 flex flex-wrap items-center gap-6 text-xs font-mono text-zinc-400 border-t border-zinc-900">
               <div className="flex items-center gap-2">
-                <span className="w-2 h-2 bg-emerald-400"></span>
+                <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
                 <span>Binary &lt; 18.5MB</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="w-2 h-2 bg-emerald-400"></span>
+                <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
                 <span>RAM &lt; 15MB</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="w-2 h-2 bg-emerald-400"></span>
+                <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
                 <span>Zero CGO</span>
               </div>
             </div>
