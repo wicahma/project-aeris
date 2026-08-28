@@ -20,10 +20,10 @@ steps:
     image: bash
     commands:
       - export PATH="/home/diama/.nvm/versions/node/v24.16.0/bin:$PATH"
-      - chmod -R 777 /home/diama/repos/project-aeris/landing-page/dist 2>/dev/null || true
-      - rsync -av --no-o --no-g --no-perms --no-t landing-page/dist/ /home/diama/repos/project-aeris/landing-page/dist/
-      - chmod -R 777 /home/diama/repos/project-aeris/landing-page/dist 2>/dev/null || true
-      - echo "Production static assets synced to live server path successfully!"
+      - mkdir -p /tmp/aeris-landing-dist
+      - rm -rf /tmp/aeris-landing-dist/*
+      - cp -r landing-page/dist/* /tmp/aeris-landing-dist/
+      - echo "Production static assets deployed to /tmp/aeris-landing-dist successfully!"
 
 when:
   event: push
