@@ -8,22 +8,35 @@ labels:
   backend: local
 
 steps:
-  - name: build-landing
+  - name: build-frontend
+    image: bash
+    commands:
+      - export PATH="/home/diama/.nvm/versions/node/v24.16.0/bin:$PATH"
+      - cd applications/frontend
+      - npm install
+      - npm run build
+
+  - name: build-backend
+    image: bash
+    commands:
+      - export PATH="/usr/local/go/bin:$PATH"
+      - cd applications/backend
+      - rm -rf cmd/server/dist
+      - cp -r ../frontend/dist cmd/server/dist
+      - go mod tidy
+      - go build -o aeris-server ./cmd/server
+
+  - name: deploy-landing
     image: bash
     commands:
       - export PATH="/home/diama/.nvm/versions/node/v24.16.0/bin:$PATH"
       - cd landing-page
       - npm install
       - npm run build
-
-  - name: deploy-landing
-    image: bash
-    commands:
-      - export PATH="/home/diama/.nvm/versions/node/v24.16.0/bin:$PATH"
       - mkdir -p /tmp/aeris-landing-dist
       - rm -rf /tmp/aeris-landing-dist/*
-      - cp -r landing-page/dist/* /tmp/aeris-landing-dist/
-      - echo "Production static assets deployed to /tmp/aeris-landing-dist successfully!"
+      - cp -r dist/* /tmp/aeris-landing-dist/
+      - echo "Landing page assets deployed to /tmp/aeris-landing-dist successfully!"
 
 when:
   event: push
