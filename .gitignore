@@ -4,4 +4,4 @@ dist/
 .env
 .DS_Store
 *.db
-*.log
+*.logdeploy-landing.sh

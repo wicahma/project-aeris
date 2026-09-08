@@ -30,13 +30,11 @@ steps:
     image: bash
     commands:
       - export PATH="/home/diama/.nvm/versions/node/v24.16.0/bin:$PATH"
+      - if [ -f /home/diama/.woodpecker-secrets/aeris-cf.env ]; then source /home/diama/.woodpecker-secrets/aeris-cf.env; fi
       - cd landing-page
       - npm install
       - npm run build
-      - mkdir -p /tmp/aeris-landing-dist
-      - rm -rf /tmp/aeris-landing-dist/*
-      - cp -r dist/* /tmp/aeris-landing-dist/
-      - echo "Landing page assets deployed to /tmp/aeris-landing-dist successfully!"
+      - npx wrangler pages deploy dist --project-name=aeris-landing --branch=main --commit-dirty=true
 
 when:
   event: push
