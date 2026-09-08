@@ -1,7 +1,44 @@
 ---
-import fs from 'node:fs';
-import path from 'node:path';
-
-const html = fs.readFileSync(path.resolve('./src/templates/landing.html'), 'utf-8');
+import { Nav } from '../components/organisms/Nav';
+import { Hero } from '../components/organisms/Hero';
+import { Philosophy } from '../components/organisms/Philosophy';
+import { Features } from '../components/organisms/Features';
+import { Architecture } from '../components/organisms/Architecture';
+import { Quickstart } from '../components/organisms/Quickstart';
+import { Footer } from '../components/organisms/Footer';
+import '../styles/global.css';
 ---
-<Fragment set:html={html} />
+
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Aeris - Zero-Dependency Embedded DBMS</title>
+    <meta name="description" content="A unified storage engine and reactive web console compiled into a single standalone Golang executable." />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://aeris.diama.dev/" />
+    <meta property="og:title" content="Aeris - Zero-Dependency Embedded DBMS" />
+    <meta property="og:description" content="A unified storage engine and reactive web console compiled into a single standalone Golang executable." />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="bg-[var(--bg)] text-[var(--fg)] font-sans antialiased">
+    <div class="max-w-[1160px] mx-auto px-4 sm:px-8">
+      <Nav client:load />
+      <main id="content">
+        <Hero client:load />
+        <Philosophy />
+        <Features />
+        <Architecture />
+        <Quickstart client:load />
+      </main>
+      <Footer client:load />
+    </div>
+  </body>
+</html>

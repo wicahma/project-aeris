@@ -1,65 +1,46 @@
 import React from 'react';
-import { BookOpen, Terminal, Download, ShieldCheck, Layers, Cpu } from 'lucide-react';
 
-interface DocsSidebarProps {
-  currentPath?: string;
-}
-
-export const DocsSidebar: React.FC<DocsSidebarProps> = ({ currentPath = '/docs/introduction' }) => {
-  const sections = [
-    {
-      title: 'Getting Started',
-      items: [
-        { label: 'Introduction', href: '/docs/introduction', icon: BookOpen },
-        { label: 'Installation', href: '/docs/installation', icon: Download }
-      ]
-    },
-    {
-      title: 'Architecture & Engine',
-      items: [
-        { label: 'Single-Binary Go Engine', href: '/docs/introduction#architecture', icon: Cpu },
-        { label: 'Embedded Web Console', href: '/docs/introduction#web-console', icon: Layers }
-      ]
-    },
-    {
-      title: 'CLI & Distribution',
-      items: [
-        { label: 'CLI Subcommands', href: '/docs/installation#cli-reference', icon: Terminal },
-        { label: 'Systemd Integration', href: '/docs/installation#systemd', icon: ShieldCheck }
-      ]
-    }
-  ];
-
+export const DocsSidebar: React.FC = () => {
   return (
-    <aside className="w-64 shrink-0 font-mono text-xs space-y-6">
-      {sections.map((section, idx) => (
-        <div key={idx} className="space-y-2">
-          <div className="text-[11px] font-bold tracking-wider text-brand-primary uppercase px-2">
-            {section.title}
-          </div>
-          <ul className="space-y-1">
-            {section.items.map((item, itemIdx) => {
-              const Icon = item.icon;
-              const isActive = currentPath === item.href;
-              return (
-                <li key={itemIdx}>
-                  <a
-                    href={item.href}
-                    className={`flex items-center gap-2 px-2.5 py-1.5 rounded-md transition-colors ${
-                      isActive
-                        ? 'bg-brand-primary/10 text-brand-primary font-bold border border-brand-primary/30'
-                        : 'text-zinc-400 hover:text-zinc-100 hover:bg-zinc-900'
-                    }`}
-                  >
-                    <Icon className="w-3.5 h-3.5" />
-                    <span>{item.label}</span>
-                  </a>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-      ))}
+    <aside className="w-64 border-r border-border p-6 bg-surface hidden lg:block sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-auto font-mono text-xs">
+      <div className="mb-6">
+        <div className="text-faint uppercase tracking-wider text-[11px] mb-3">Getting Started</div>
+        <ul className="space-y-2">
+          <li><a href="#overview" className="sidebar-link text-accent block hover:underline">Overview</a></li>
+          <li><a href="#installation" className="sidebar-link text-muted hover:text-fg block">Installation</a></li>
+          <li><a href="#quickstart" className="sidebar-link text-muted hover:text-fg block">Quick Start</a></li>
+          <li><a href="#architecture" className="sidebar-link text-muted hover:text-fg block">Architecture</a></li>
+        </ul>
+      </div>
+
+      <div className="mb-6">
+        <div className="text-faint uppercase tracking-wider text-[11px] mb-3">Core Engine</div>
+        <ul className="space-y-2">
+          <li><a href="#storage-engine" className="sidebar-link text-muted hover:text-fg block">Storage &amp; WAL</a></li>
+          <li><a href="#web-console" className="sidebar-link text-muted hover:text-fg block">Embedded Web Console</a></li>
+          <li><a href="#auth-sessions" className="sidebar-link text-muted hover:text-fg block">Auth &amp; Permissions</a></li>
+        </ul>
+      </div>
+
+      <div className="mb-6">
+        <div className="text-faint uppercase tracking-wider text-[11px] mb-3">REST API</div>
+        <ul className="space-y-2">
+          <li><a href="#api-overview" className="sidebar-link text-muted hover:text-fg block">Overview &amp; Headers</a></li>
+          <li><a href="#api-auth-login" className="sidebar-link text-muted hover:text-fg block"><code>POST /api/v1/auth/login</code></a></li>
+          <li><a href="#api-query" className="sidebar-link text-muted hover:text-fg block"><code>POST /api/v1/query</code></a></li>
+          <li><a href="#api-tables" className="sidebar-link text-muted hover:text-fg block"><code>GET /api/v1/tables</code></a></li>
+          <li><a href="#api-health" className="sidebar-link text-muted hover:text-fg block"><code>GET /api/v1/health</code></a></li>
+        </ul>
+      </div>
+
+      <div>
+        <div className="text-faint uppercase tracking-wider text-[11px] mb-3">CLI Reference</div>
+        <ul className="space-y-2">
+          <li><a href="#cli-server" className="sidebar-link text-muted hover:text-fg block"><code>aeris server</code></a></li>
+          <li><a href="#cli-backup" className="sidebar-link text-muted hover:text-fg block"><code>aeris backup</code></a></li>
+          <li><a href="#cli-restore" className="sidebar-link text-muted hover:text-fg block"><code>aeris restore</code></a></li>
+        </ul>
+      </div>
     </aside>
   );
 };

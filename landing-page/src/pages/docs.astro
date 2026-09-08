@@ -1,7 +1,36 @@
 ---
-import fs from 'node:fs';
-import path from 'node:path';
-
-const html = fs.readFileSync(path.resolve('./src/templates/docs.html'), 'utf-8');
+import { DocsHeader } from '../components/organisms/DocsHeader';
+import { DocsSidebar } from '../components/organisms/DocsSidebar';
+import { DocsToc } from '../components/organisms/DocsToc';
+import { DocsContent } from '../components/organisms/DocsContent';
+import '../styles/global.css';
 ---
-<Fragment set:html={html} />
+
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Aeris Docs - API Reference &amp; Architecture</title>
+    <meta name="description" content="Complete technical specification, REST API contracts, and operational guides for Aeris DBMS." />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://aeris.diama.dev/docs" />
+    <meta property="og:title" content="Aeris Documentation" />
+    <meta property="og:description" content="Complete technical specification, REST API contracts, and operational guides." />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="bg-[var(--bg)] text-[var(--fg)] font-sans antialiased">
+    <DocsHeader client:load />
+    <div class="flex pt-14">
+      <DocsSidebar />
+      <DocsContent client:load />
+      <DocsToc />
+    </div>
+  </body>
+</html>

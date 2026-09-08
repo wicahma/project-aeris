@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: oklch(0.17 0.006 260);
+  --surface: oklch(0.21 0.006 260);
+  --surface-2: oklch(0.24 0.006 260);
+  --fg: oklch(0.95 0.004 260);
+  --muted: oklch(0.66 0.012 260);
+  --faint: oklch(0.5 0.012 260);
+  --border: oklch(1 0 0 / 0.12);
+  --border-strong: oklch(1 0 0 / 0.22);
+  --accent: oklch(0.83 0.17 140);
+  --accent-ink: oklch(0.17 0.006 260);
+  --code-bg: oklch(0.12 0.006 260);
+  --kw: oklch(0.83 0.17 140);
+  --id: oklch(0.78 0.11 230);
+  --str: oklch(0.82 0.14 80);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--fg);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}

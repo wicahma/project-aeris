@@ -4,6 +4,17 @@ export default {
   theme: {
     extend: {
       colors: {
+        bg: 'var(--bg)',
+        surface: 'var(--surface)',
+        'surface-2': 'var(--surface-2)',
+        fg: 'var(--fg)',
+        muted: 'var(--muted)',
+        faint: 'var(--faint)',
+        border: 'var(--border)',
+        'border-strong': 'var(--border-strong)',
+        accent: 'var(--accent)',
+        'accent-ink': 'var(--accent-ink)',
+        'code-bg': 'var(--code-bg)',
         dark: {
           bg: '#09090b',
           card: '#121215',
@@ -18,8 +29,8 @@ export default {
       },
       fontFamily: {
         mono: ['JetBrains Mono', 'Fira Code', 'monospace'],
-        display: ['Cabinet Grotesk', 'Plus Jakarta Sans', 'sans-serif'],
-        sans: ['Plus Jakarta Sans', 'Inter', 'sans-serif']
+        display: ['Space Grotesk', 'Cabinet Grotesk', 'sans-serif'],
+        sans: ['Inter', 'Plus Jakarta Sans', 'sans-serif']
       }
     }
   },
