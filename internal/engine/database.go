@@ -1,0 +1,169 @@
+package engine
+
+import (
+	"database/sql"
+	"fmt"
+	"path/filepath"
+	"strings"
+	"time"
+
+	_ "modernc.org/sqlite"
+)
+
+type Column struct {
+	Name       string `json:"name"`
+	Type       string `json:"type"`
+	Nullable   bool   `json:"nullable"`
+	Default    any    `json:"default"`
+	PrimaryKey bool   `json:"primaryKey"`
+}
+
+type Table struct {
+	Name    string   `json:"name"`
+	Type    string   `json:"type"`
+	Columns []Column `json:"columns"`
+}
+
+type QueryResult struct {
+	Columns      []string `json:"columns"`
+	Rows         [][]any  `json:"rows"`
+	RowsAffected int64    `json:"rowsAffected"`
+	DurationMs   float64  `json:"durationMs"`
+}
+
+type Database struct {
+	db       *sql.DB
+	Name     string `json:"name"`
+	Path     string `json:"path"`
+	InMemory bool   `json:"inMemory"`
+}
+
+func dsn(path string, inMemory bool) string {
+	if inMemory {
+		return "file::memory:?cache=shared&_pragma=journal_mode(WAL)&_pragma=foreign_keys(1)&_pragma=busy_timeout(5000)"
+	}
+	return fmt.Sprintf("file:%s?_pragma=journal_mode(WAL)&_pragma=foreign_keys(1)&_pragma=busy_timeout(5000)", path)
+}
+
+func Open(dataDir, name string, inMemory bool) (*Database, error) {
+	if err := ValidateIdent(name); err != nil {
+		return nil, fmt.Errorf("invalid database name: %w", err)
+	}
+	path := ":memory:"
+	if !inMemory {
+		path = filepath.Join(dataDir, name+".db")
+	}
+	db, err := sql.Open("sqlite", dsn(path, inMemory))
+	if err != nil {
+		return nil, err
+	}
+	db.SetMaxOpenConns(1)
+	if err := db.Ping(); err != nil {
+		db.Close()
+		return nil, err
+	}
+	return &Database{db: db, Name: name, Path: path, InMemory: inMemory}, nil
+}
+
+func (d *Database) Close() error { return d.db.Close() }
+
+func (d *Database) Query(sqlText string) (*QueryResult, error) {
+	start := time.Now()
+	res := &QueryResult{}
+	if isReadQuery(sqlText) {
+		rows, err := d.db.Query(sqlText)
+		if err != nil {
+			return nil, err
+		}
+		defer rows.Close()
+		cols, err := rows.Columns()
+		if err != nil {
+			return nil, err
+		}
+		res.Columns = cols
+		for rows.Next() {
+			vals := make([]any, len(cols))
+			ptrs := make([]any, len(cols))
+			for i := range vals {
+				ptrs[i] = &vals[i]
+			}
+			if err := rows.Scan(ptrs...); err != nil {
+				return nil, err
+			}
+			for i, v := range vals {
+				if b, ok := v.([]byte); ok {
+					vals[i] = string(b)
+				}
+			}
+			res.Rows = append(res.Rows, vals)
+		}
+		if err := rows.Err(); err != nil {
+			return nil, err
+		}
+	} else {
+		r, err := d.db.Exec(sqlText)
+		if err != nil {
+			return nil, err
+		}
+		res.RowsAffected, _ = r.RowsAffected()
+	}
+	res.DurationMs = float64(time.Since(start).Microseconds()) / 1000
+	return res, nil
+}
+
+func isReadQuery(q string) bool {
+	s := strings.ToUpper(strings.TrimSpace(q))
+	return strings.HasPrefix(s, "SELECT") || strings.HasPrefix(s, "PRAGMA") ||
+		strings.HasPrefix(s, "EXPLAIN") || strings.HasPrefix(s, "WITH")
+}
+
+func (d *Database) Schema() ([]Table, error) {
+	rows, err := d.db.Query(`SELECT name, type FROM sqlite_master WHERE type IN ('table','view') AND name NOT LIKE 'sqlite_%' ORDER BY name`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var tables []Table
+	for rows.Next() {
+		var t Table
+		if err := rows.Scan(&t.Name, &t.Type); err != nil {
+			return nil, err
+		}
+		tables = append(tables, t)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	for i := range tables {
+		cols, err := d.columns(tables[i].Name)
+		if err != nil {
+			return nil, err
+		}
+		tables[i].Columns = cols
+	}
+	return tables, nil
+}
+
+func (d *Database) columns(table string) ([]Column, error) {
+	if err := ValidateIdent(table); err != nil {
+		return nil, err
+	}
+	rows, err := d.db.Query(fmt.Sprintf(`PRAGMA table_info(%s)`, QuoteIdent(table)))
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var cols []Column
+	for rows.Next() {
+		var c Column
+		var cid int
+		var notnull, pk int
+		if err := rows.Scan(&cid, &c.Name, &c.Type, &notnull, &c.Default, &pk); err != nil {
+			return nil, err
+		}
+		c.Nullable = notnull == 0
+		c.PrimaryKey = pk > 0
+		cols = append(cols, c)
+	}
+	return cols, rows.Err()
+}
