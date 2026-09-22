@@ -13,6 +13,8 @@ interface IHistoryState {
   setFilters: (db: string, filters: IHistoryFilters) => Promise<void>
   saveCurrent: (db: string, title: string, category: string, queryText: string) => Promise<void>
   removeSaved: (db: string, id: string) => Promise<void>
+  togglePin: (db: string, id: string, pinned: boolean) => Promise<void>
+  prune: (db: string, maxAgeDays?: number) => Promise<number>
 }
 
 export const useHistoryStore = create<IHistoryState>((set, get) => ({
@@ -65,6 +67,26 @@ export const useHistoryStore = create<IHistoryState>((set, get) => ({
       await get().loadSaved(db)
     } catch (e) {
       set({ error: (e as Error).message })
+    }
+  },
+
+  togglePin: async (db, id, pinned) => {
+    try {
+      await api.pinHistory(db, id, pinned)
+      await get().load(db)
+    } catch (e) {
+      set({ error: (e as Error).message })
+    }
+  },
+
+  prune: async (db, maxAgeDays) => {
+    try {
+      const res = await api.pruneHistory(db, maxAgeDays)
+      await get().load(db)
+      return res.deleted
+    } catch (e) {
+      set({ error: (e as Error).message })
+      return 0
     }
   },
 }))

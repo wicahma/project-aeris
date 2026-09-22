@@ -2,9 +2,48 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 )
+
+func (s *Server) handlePruneHistory(w http.ResponseWriter, r *http.Request) {
+	db, ok := s.mgr.Get(r.PathValue("db"))
+	if !ok {
+		writeErr(w, http.StatusNotFound, errNotFound(r.PathValue("db")))
+		return
+	}
+	maxAge := 0
+	if v := r.URL.Query().Get("maxAgeDays"); v != "" {
+		fmt.Sscanf(v, "%d", &maxAge)
+	}
+	deleted, err := db.PruneHistory(maxAge)
+	if err != nil {
+		writeErr(w, http.StatusInternalServerError, err)
+		return
+	}
+	writeData(w, map[string]any{"deleted": deleted})
+}
+
+func (s *Server) handlePinHistory(w http.ResponseWriter, r *http.Request) {
+	db, ok := s.mgr.Get(r.PathValue("db"))
+	if !ok {
+		writeErr(w, http.StatusNotFound, errNotFound(r.PathValue("db")))
+		return
+	}
+	var body struct {
+		Pinned bool `json:"pinned"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		writeErr(w, http.StatusBadRequest, err)
+		return
+	}
+	if err := db.SetPinned(r.PathValue("id"), body.Pinned); err != nil {
+		writeErr(w, http.StatusBadRequest, err)
+		return
+	}
+	writeData(w, map[string]any{"pinned": body.Pinned})
+}
 
 func (s *Server) handleListHistory(w http.ResponseWriter, r *http.Request) {
 	db, ok := s.mgr.Get(r.PathValue("db"))

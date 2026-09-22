@@ -141,6 +141,41 @@ func (d *Database) writeHistory(e HistoryEntry) {
 	}
 }
 
+// PruneHistory implements QE-009 manual trigger: TTL purge + entry-cap prune.
+// Pin-safe (is_pinned = 0 only). Returns rows deleted.
+func (d *Database) PruneHistory(maxAgeDays int) (int64, error) {
+	var total int64
+	if maxAgeDays > 0 {
+		cutoff := time.Now().Add(-time.Duration(maxAgeDays) * 24 * time.Hour).UnixMilli()
+		r, err := d.db.Exec(`DELETE FROM _system_query_history WHERE is_pinned = 0 AND executed_at < ?`, cutoff)
+		if err != nil {
+			return 0, err
+		}
+		n, _ := r.RowsAffected()
+		total += n
+	}
+	r, err := d.db.Exec(
+		`DELETE FROM _system_query_history WHERE is_pinned = 0 AND rowid NOT IN (SELECT rowid FROM _system_query_history WHERE is_pinned = 0 ORDER BY executed_at DESC, rowid DESC LIMIT ?)`, maxHistoryEntries,
+	)
+	if err != nil {
+		return total, err
+	}
+	n, _ := r.RowsAffected()
+	return total + n, nil
+}
+
+// SetPinned implements QE-010 pin toggle: protects entry from pruning.
+func (d *Database) SetPinned(queryID string, pinned bool) error {
+	r, err := d.db.Exec(`UPDATE _system_query_history SET is_pinned = ? WHERE query_id = ?`, pinned, queryID)
+	if err != nil {
+		return err
+	}
+	if n, _ := r.RowsAffected(); n == 0 {
+		return fmt.Errorf("ERR_HISTORY_NOT_FOUND: %q", queryID)
+	}
+	return nil
+}
+
 func (d *Database) RecordQuery(queryText string, result *QueryResult, execErr error) {
 	defer func() {
 		if r := recover(); r != nil {

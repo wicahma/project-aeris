@@ -8,18 +8,23 @@ const STATUS_COLOR: Record<string, string> = {
   FAILED: 'text-error',
 }
 
-function HistoryRow({ entry, onReuse }: { entry: IHistoryEntry; onReuse: (sql: string) => void }) {
+function HistoryRow({ entry, onReuse, onPin }: { entry: IHistoryEntry; onReuse: (sql: string) => void; onPin: (id: string, pinned: boolean) => void }) {
   return (
-    <button
-      onClick={() => onReuse(entry.queryText)}
-      title={entry.errorMessage || entry.queryText}
-      className="flex w-full items-center gap-2 border-b border-border px-2 py-1 text-left text-xs hover:bg-hover"
-    >
-      <span className={`w-14 shrink-0 ${STATUS_COLOR[entry.status] ?? ''}`}>{entry.status}</span>
-      <span className="w-16 shrink-0 text-muted">{entry.statementType}</span>
-      <span className="flex-1 truncate font-mono">{entry.snippet}</span>
-      <span className="shrink-0 text-muted">{formatTimestamp(entry.executedAt)}</span>
-    </button>
+    <div className="flex w-full items-center gap-2 border-b border-border px-2 py-1 text-xs hover:bg-hover">
+      <button
+        onClick={() => onPin(entry.queryId, !entry.pinned)}
+        aria-label={entry.pinned ? 'Unpin' : 'Pin'}
+        className={`shrink-0 ${entry.pinned ? 'text-accent' : 'text-disabled hover:text-muted'}`}
+      >
+        {entry.pinned ? '●' : '○'}
+      </button>
+      <button onClick={() => onReuse(entry.queryText)} title={entry.errorMessage || entry.queryText} className="flex flex-1 items-center gap-2 text-left">
+        <span className={`w-14 shrink-0 ${STATUS_COLOR[entry.status] ?? ''}`}>{entry.status}</span>
+        <span className="w-16 shrink-0 text-muted">{entry.statementType}</span>
+        <span className="flex-1 truncate font-mono">{entry.snippet}</span>
+        <span className="shrink-0 text-muted">{formatTimestamp(entry.executedAt)}</span>
+      </button>
+    </div>
   )
 }
 
@@ -35,7 +40,7 @@ function SavedRow({ title, category, onUse, onDelete }: { title: string; categor
 }
 
 export function HistoryPanel() {
-  const { entries, saved, filters, loading, error, activeDb, promptOpen, activeSql, reuseSql, setPromptOpen, onFilter, onSave, onDeleteSaved } =
+  const { entries, saved, filters, loading, error, activeDb, promptOpen, activeSql, reuseSql, setPromptOpen, onFilter, onSave, onDeleteSaved, onTogglePin, onPrune } =
     useHistoryPanelHooks()
   const [tab, setTab] = useState<'history' | 'saved'>('history')
   const [title, setTitle] = useState('')
@@ -91,6 +96,11 @@ export function HistoryPanel() {
               />
             </>
           )}
+          {tab === 'history' && (
+            <button onClick={onPrune} className="text-xs text-muted hover:text-text" aria-label="Prune history" title="Prune history">
+              ✂
+            </button>
+          )}
           {tab === 'saved' && (
             <button onClick={() => setPromptOpen(true)} className="text-xs text-accent hover:underline">
               Save current
@@ -104,7 +114,7 @@ export function HistoryPanel() {
 
       <div className="flex-1 overflow-y-auto">
         {tab === 'history' &&
-          entries.map((e) => <HistoryRow key={e.queryId} entry={e} onReuse={reuseSql} />)}
+          entries.map((e) => <HistoryRow key={e.queryId} entry={e} onReuse={reuseSql} onPin={onTogglePin} />)}
         {tab === 'saved' &&
           saved.map((s) => (
             <SavedRow

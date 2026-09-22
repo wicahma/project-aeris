@@ -11,6 +11,8 @@ func (s *Server) Routes() http.Handler {
 	mux.HandleFunc("POST /api/v1/databases/{db}/query", s.handleQuery)
 	mux.HandleFunc("GET /api/v1/databases/{db}/schema", s.handleSchema)
 	mux.HandleFunc("GET /api/v1/databases/{db}/queries/history", s.handleListHistory)
+	mux.HandleFunc("POST /api/v1/databases/{db}/queries/history/prune", s.handlePruneHistory)
+	mux.HandleFunc("PATCH /api/v1/databases/{db}/queries/history/{id}/pin", s.handlePinHistory)
 	mux.HandleFunc("POST /api/v1/databases/{db}/schema/table", s.handleCreateTable)
 	mux.HandleFunc("POST /api/v1/databases/{db}/schema/table/{table}/column", s.handleAddColumn)
 	mux.HandleFunc("GET /api/v1/databases/{db}/tables/{table}/data", s.handleBrowseTable)

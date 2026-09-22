@@ -59,6 +59,10 @@ export const api = {
     fetch(`/api/v1/databases/${db}/queries/saved/${id}`, { method: 'DELETE' }).then((res) => {
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
     }),
+  pinHistory: (db: string, id: string, pinned: boolean) =>
+    req<{ pinned: boolean }>(`/databases/${db}/queries/history/${id}/pin`, { method: 'PATCH', body: JSON.stringify({ pinned }) }),
+  pruneHistory: (db: string, maxAgeDays?: number) =>
+    req<{ deleted: number }>(`/databases/${db}/queries/history/prune`, { method: 'POST', body: JSON.stringify({ maxAgeDays }) }),
   dropColumn: (db: string, table: string, column: string, confirm: string) =>
     fetch(`/api/v1/databases/${db}/tables/${table}/columns/${column}?confirm=${encodeURIComponent(confirm)}`, { method: 'DELETE' }).then((res) => {
       if (!res.ok) return res.json().then((b: IApiEnvelope<unknown>) => Promise.reject(new Error(b.error ?? `HTTP ${res.status}`)))
