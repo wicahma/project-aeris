@@ -14,6 +14,8 @@ func (s *Server) Routes() http.Handler {
 	mux.HandleFunc("POST /api/v1/databases/{db}/queries/history/prune", s.handlePruneHistory)
 	mux.HandleFunc("PATCH /api/v1/databases/{db}/queries/history/{id}/pin", s.handlePinHistory)
 	mux.HandleFunc("GET /api/v1/databases/{db}/migrations", s.handleListMigrations)
+	mux.HandleFunc("GET /api/v1/databases/{db}/catalog/verify", s.handleVerifyCatalog)
+	mux.HandleFunc("POST /api/v1/databases/{db}/catalog/reconcile", s.handleReconcileCatalog)
 	mux.HandleFunc("POST /api/v1/databases/{db}/schema/table", s.handleCreateTable)
 	mux.HandleFunc("POST /api/v1/databases/{db}/schema/table/{table}/column", s.handleAddColumn)
 	mux.HandleFunc("GET /api/v1/databases/{db}/tables/{table}/data", s.handleBrowseTable)

@@ -21,6 +21,36 @@ func (s *Server) handleListMigrations(w http.ResponseWriter, r *http.Request) {
 	writeData(w, ms)
 }
 
+func (s *Server) handleVerifyCatalog(w http.ResponseWriter, r *http.Request) {
+	db, ok := s.mgr.Get(r.PathValue("db"))
+	if !ok {
+		writeErr(w, http.StatusNotFound, errNotFound(r.PathValue("db")))
+		return
+	}
+	res, err := db.VerifyCatalog()
+	if err != nil {
+		writeErr(w, http.StatusInternalServerError, err)
+		return
+	}
+	writeData(w, res)
+}
+
+func (s *Server) handleReconcileCatalog(w http.ResponseWriter, r *http.Request) {
+	db, ok := s.mgr.Get(r.PathValue("db"))
+	if !ok {
+		writeErr(w, http.StatusNotFound, errNotFound(r.PathValue("db")))
+		return
+	}
+	// ponytail: reconcile = re-verify (hash update). No separate _system_tables
+	// to rebuild — sqlite_master IS the catalog.
+	res, err := db.VerifyCatalog()
+	if err != nil {
+		writeErr(w, http.StatusInternalServerError, err)
+		return
+	}
+	writeData(w, map[string]any{"reconciled": true, "result": res})
+}
+
 func (s *Server) handlePruneHistory(w http.ResponseWriter, r *http.Request) {
 	db, ok := s.mgr.Get(r.PathValue("db"))
 	if !ok {

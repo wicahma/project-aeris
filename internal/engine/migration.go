@@ -47,6 +47,20 @@ func (d *Database) recordMigration(changeType, target, ddl string) {
 		// Ledger write failure should not fail the DDL itself — log only.
 		fmt.Printf("migration ledger: %v\n", err)
 	}
+	// Update catalog hash after schema mutation
+	d.updateCatalogHash()
+}
+
+func (d *Database) updateCatalogHash() {
+	schema, err := d.Schema()
+	if err != nil {
+		return
+	}
+	hash := schemaHash(schema)
+	if _, err := d.db.Exec(`CREATE TABLE IF NOT EXISTS _system_catalog (key TEXT PRIMARY KEY, value TEXT)`); err != nil {
+		return
+	}
+	d.db.Exec(`INSERT OR REPLACE INTO _system_catalog (key, value) VALUES ('schema_hash', ?)`, hash)
 }
 
 // ListMigrations returns the ledger in reverse-chronological order.
