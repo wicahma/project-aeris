@@ -7,6 +7,20 @@ import (
 	"strconv"
 )
 
+func (s *Server) handleListMigrations(w http.ResponseWriter, r *http.Request) {
+	db, ok := s.mgr.Get(r.PathValue("db"))
+	if !ok {
+		writeErr(w, http.StatusNotFound, errNotFound(r.PathValue("db")))
+		return
+	}
+	ms, err := db.ListMigrations()
+	if err != nil {
+		writeErr(w, http.StatusInternalServerError, err)
+		return
+	}
+	writeData(w, ms)
+}
+
 func (s *Server) handlePruneHistory(w http.ResponseWriter, r *http.Request) {
 	db, ok := s.mgr.Get(r.PathValue("db"))
 	if !ok {

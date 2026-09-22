@@ -57,9 +57,11 @@ func (d *Database) DropColumn(table, column, confirm string) (int64, error) {
 	if err := d.db.QueryRow(`SELECT COUNT(*) FROM ` + QuoteIdent(table)).Scan(&rows); err != nil {
 		return 0, err
 	}
-	if _, err := d.db.Exec(`ALTER TABLE ` + QuoteIdent(table) + ` DROP COLUMN ` + QuoteIdent(column)); err != nil {
+	ddl := `ALTER TABLE ` + QuoteIdent(table) + ` DROP COLUMN ` + QuoteIdent(column)
+	if _, err := d.db.Exec(ddl); err != nil {
 		return 0, fmt.Errorf("ERR_DROP_COLUMN: %w", err)
 	}
+	d.recordMigration("ALTER_DROP_COL", table+"."+column, ddl)
 	return rows, nil
 }
 
@@ -88,6 +90,7 @@ func (d *Database) DropTable(name, confirm string) error {
 	if _, err := d.db.Exec(`DROP TABLE ` + QuoteIdent(name)); err != nil {
 		return err
 	}
+	d.recordMigration("DROP", name, `DROP TABLE `+QuoteIdent(name))
 	return nil
 }
 
@@ -119,8 +122,10 @@ func (d *Database) RenameTable(oldName, newName string) error {
 	if !found {
 		return fmt.Errorf("ERR_TABLE_NOT_FOUND: Table %q not found", oldName)
 	}
-	if _, err := d.db.Exec(`ALTER TABLE ` + QuoteIdent(oldName) + ` RENAME TO ` + QuoteIdent(newName)); err != nil {
+	ddl := `ALTER TABLE ` + QuoteIdent(oldName) + ` RENAME TO ` + QuoteIdent(newName)
+	if _, err := d.db.Exec(ddl); err != nil {
 		return err
 	}
+	d.recordMigration("RENAME", oldName+"→"+newName, ddl)
 	return nil
 }

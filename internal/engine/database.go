@@ -45,7 +45,9 @@ type Database struct {
 
 func dsn(path string, inMemory bool) string {
 	if inMemory {
-		return "file::memory:?cache=shared&_pragma=journal_mode(WAL)&_pragma=foreign_keys(1)&_pragma=busy_timeout(5000)"
+		// ponytail: shared cache untuk history worker, tapi perlu nama unik
+		// per database agar _system_ tables tidak lintas bocor.
+		return "file:" + path + "?mode=memory&cache=shared&_pragma=journal_mode(WAL)&_pragma=foreign_keys(1)&_pragma=busy_timeout(5000)"
 	}
 	return fmt.Sprintf("file:%s?_pragma=journal_mode(WAL)&_pragma=foreign_keys(1)&_pragma=busy_timeout(5000)", path)
 }
@@ -54,7 +56,7 @@ func Open(dataDir, name string, inMemory bool) (*Database, error) {
 	if err := ValidateIdent(name); err != nil {
 		return nil, fmt.Errorf("invalid database name: %w", err)
 	}
-	path := ":memory:"
+	path := name
 	if !inMemory {
 		path = filepath.Join(dataDir, name+".db")
 	}
@@ -69,6 +71,10 @@ func Open(dataDir, name string, inMemory bool) (*Database, error) {
 	}
 	d := &Database{db: db, Name: name, Path: path, InMemory: inMemory, cache: newCacheStore()}
 	if err := d.initHistory(); err != nil {
+		db.Close()
+		return nil, err
+	}
+	if err := d.initMigrations(); err != nil {
 		db.Close()
 		return nil, err
 	}
@@ -224,6 +230,7 @@ func (d *Database) Create(spec *CreateTableSpec) error {
 		}
 		return err
 	}
+	d.recordMigration("CREATE", spec.Name, spec.DDL())
 	return nil
 }
 
@@ -258,5 +265,6 @@ func (d *Database) AddColumn(spec *AddColumnSpec) error {
 		}
 		return err
 	}
+	d.recordMigration("ALTER_ADD", spec.Table+"."+col.Name, ddl)
 	return nil
 }

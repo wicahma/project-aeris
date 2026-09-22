@@ -157,6 +157,7 @@ func (d *Database) CreateIndex(spec *CreateIndexSpec) error {
 		}
 		return err
 	}
+	d.recordMigration("CREATE_INDEX", spec.Table+"."+spec.Name, spec.DDL())
 	return nil
 }
 
@@ -164,13 +165,13 @@ func (d *Database) DropIndex(name string) error {
 	if err := ValidateIdent(name); err != nil {
 		return fmt.Errorf("ERR_INDEX_NAME_INVALID: %w", err)
 	}
-	r, err := d.db.Exec(`DROP INDEX ` + QuoteIdent(name))
-	if err != nil {
+	ddl := `DROP INDEX ` + QuoteIdent(name)
+	if _, err := d.db.Exec(ddl); err != nil {
 		if strings.Contains(err.Error(), "no such index") {
 			return fmt.Errorf("ERR_INDEX_NOT_FOUND: Index %q not found", name)
 		}
 		return err
 	}
-	_ = r
+	d.recordMigration("DROP_INDEX", name, ddl)
 	return nil
 }
