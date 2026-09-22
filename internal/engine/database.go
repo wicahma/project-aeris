@@ -40,6 +40,7 @@ type Database struct {
 
 	historyCh chan HistoryEntry
 	stopCh    chan struct{}
+	cache     *cacheStore
 }
 
 func dsn(path string, inMemory bool) string {
@@ -66,7 +67,7 @@ func Open(dataDir, name string, inMemory bool) (*Database, error) {
 		db.Close()
 		return nil, err
 	}
-	d := &Database{db: db, Name: name, Path: path, InMemory: inMemory}
+	d := &Database{db: db, Name: name, Path: path, InMemory: inMemory, cache: newCacheStore()}
 	if err := d.initHistory(); err != nil {
 		db.Close()
 		return nil, err
@@ -97,6 +98,9 @@ func (d *Database) QueryCtx(ctx context.Context, sqlText string) (*QueryResult, 
 	defer func() {
 		res.DurationMs = float64(time.Since(start).Microseconds()) / 1000
 		d.RecordQuery(sqlText, res, execErr)
+		if execErr == nil {
+			d.invalidateOnWrite(sqlText)
+		}
 	}()
 	if isReadQuery(sqlText) {
 		var rows *sql.Rows

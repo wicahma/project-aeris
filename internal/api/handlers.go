@@ -21,7 +21,9 @@ type attachRequest struct {
 }
 
 type queryRequest struct {
-	SQL string `json:"sql"`
+	SQL      string `json:"sql"`
+	Page     int    `json:"page,omitempty"`
+	PageSize int    `json:"pageSize,omitempty"`
 }
 
 func (s *Server) handleHealth(w http.ResponseWriter, r *http.Request) {
@@ -65,6 +67,15 @@ func (s *Server) handleQuery(w http.ResponseWriter, r *http.Request) {
 	var req queryRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		writeErr(w, http.StatusBadRequest, err)
+		return
+	}
+	if req.Page > 0 || req.PageSize > 0 {
+		res, cached, err := db.QueryPaged(r.Context(), req.SQL, req.Page, req.PageSize)
+		if err != nil {
+			writeErr(w, http.StatusBadRequest, err)
+			return
+		}
+		writeData(w, map[string]any{"result": res, "cached": cached, "page": req.Page, "pageSize": req.PageSize})
 		return
 	}
 	res, err := db.QueryCtx(r.Context(), req.SQL)
