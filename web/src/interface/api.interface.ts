@@ -73,3 +73,19 @@ export interface IExplainNode {
   notUsed: number
   detail: string
 }
+
+export interface IImportSpec {
+  columns: string[]
+  delimiter?: string
+  hasHeader?: boolean
+  duplicateStrategy?: 'fail' | 'skip' | 'overwrite'
+  data: string
+}
+
+export interface IImportResult {
+  processedRows: number
+  insertedRows: number
+  skippedRows: number
+  failedRows: number
+  errors?: Array<{ row: number; message: string }>
+}

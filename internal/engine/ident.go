@@ -15,6 +15,11 @@ func ValidateIdent(name string) error {
 	return nil
 }
 
+func ReservedIdent(name string) bool {
+	l := strings.ToLower(name)
+	return strings.HasPrefix(l, "_system_") || strings.HasPrefix(l, "sqlite_")
+}
+
 func QuoteIdent(name string) string {
 	return `"` + strings.ReplaceAll(name, `"`, `""`) + `"`
 }

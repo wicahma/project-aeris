@@ -1,4 +1,4 @@
-import type { IApiEnvelope, IDatabase, IExplainNode, IHistoryEntry, IHistoryFilters, IIndex, IQueryResult, ISavedQuery, ITable } from '../../interface/api.interface'
+import type { IApiEnvelope, IDatabase, IExplainNode, IHistoryEntry, IHistoryFilters, IImportResult, IImportSpec, IIndex, IQueryResult, ISavedQuery, ITable } from '../../interface/api.interface'
 import type { IBatchOp, ITableDataResponse } from '../../utils/data-pending.util'
 
 async function req<T>(path: string, init?: RequestInit): Promise<T> {
@@ -74,4 +74,8 @@ export const api = {
     }),
   explain: (db: string, sql: string) =>
     req<IExplainNode[]>(`/databases/${db}/explain`, { method: 'POST', body: JSON.stringify({ sql }) }),
+  importCSV: (db: string, table: string, spec: IImportSpec) =>
+    req<IImportResult>(`/databases/${db}/tables/${table}/import`, { method: 'POST', body: JSON.stringify(spec) }),
+  exportUrl: (db: string, table: string, format: 'csv' | 'json'): string =>
+    `/api/v1/databases/${db}/tables/${table}/export?format=${format}`,
 }

@@ -39,6 +39,43 @@ function TableRow({ t, onSelect }: { t: ITable; onSelect: (t: ITable) => void })
     void act(() => api.createIndex(activeDb, { name, table: t.name, columns: colList, unique: false }))
   }
 
+  const onImport = () => {
+    if (!activeDb) return
+    const input = document.createElement('input')
+    input.type = 'file'
+    input.accept = '.csv'
+    input.onchange = async () => {
+      const file = input.files?.[0]
+      if (!file) return
+      const text = await file.text()
+      const firstLine = text.split('\n')[0] ?? ''
+      const headers = firstLine.split(',').map((h) => h.trim()).filter(Boolean)
+      if (headers.length === 0) {
+        setError('Empty CSV file')
+        return
+      }
+      const strategy = window.prompt('Duplicate strategy (fail/skip/overwrite):', 'fail')
+      if (strategy === null) return
+      void act(() =>
+        api.importCSV(activeDb, t.name, {
+          columns: headers,
+          hasHeader: true,
+          duplicateStrategy: (strategy as 'fail' | 'skip' | 'overwrite') || 'fail',
+          data: text,
+        }).then((r) => {
+          if (r.failedRows > 0) setError(`Import: ${r.insertedRows} inserted, ${r.failedRows} failed`)
+        }),
+      )
+    }
+    input.click()
+  }
+
+  const onExport = (format: 'csv' | 'json') => {
+    if (!activeDb) return
+    window.open(api.exportUrl(activeDb, t.name, format), '_blank')
+    setMenu(false)
+  }
+
   return (
     <li className="relative">
       <div className="group flex items-center">
@@ -60,6 +97,9 @@ function TableRow({ t, onSelect }: { t: ITable; onSelect: (t: ITable) => void })
         <div className="absolute right-0 z-10 w-32 rounded-control border border-border bg-panel shadow-lg">
           <button onClick={onRename} className="block w-full px-2 py-1 text-left text-xs hover:bg-hover">Rename</button>
           <button onClick={onNewIndex} className="block w-full px-2 py-1 text-left text-xs hover:bg-hover">+ Index</button>
+          <button onClick={onImport} className="block w-full px-2 py-1 text-left text-xs hover:bg-hover">Import CSV</button>
+          <button onClick={() => onExport('csv')} className="block w-full px-2 py-1 text-left text-xs hover:bg-hover">Export CSV</button>
+          <button onClick={() => onExport('json')} className="block w-full px-2 py-1 text-left text-xs hover:bg-hover">Export JSON</button>
           <button onClick={onDrop} className="block w-full px-2 py-1 text-left text-xs text-error hover:bg-hover">Drop</button>
         </div>
       )}
