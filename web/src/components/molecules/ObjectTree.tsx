@@ -39,6 +39,16 @@ function TableRow({ t, onSelect }: { t: ITable; onSelect: (t: ITable) => void })
     void act(() => api.createIndex(activeDb, { name, table: t.name, columns: colList, unique: false }))
   }
 
+  const onDropColumn = () => {
+    if (!activeDb) return
+    const colNames = t.columns.map((c) => c.name).join(', ')
+    const col = window.prompt(`Drop column from ${t.name} (columns: ${colNames}):`)
+    if (!col) return
+    const confirm = window.prompt(`Type the column name "${col}" to confirm DROP:`)
+    if (confirm === null) return
+    void act(() => api.dropColumn(activeDb, t.name, col, confirm))
+  }
+
   const onImport = () => {
     if (!activeDb) return
     const input = document.createElement('input')
@@ -100,6 +110,7 @@ function TableRow({ t, onSelect }: { t: ITable; onSelect: (t: ITable) => void })
           <button onClick={onImport} className="block w-full px-2 py-1 text-left text-xs hover:bg-hover">Import CSV</button>
           <button onClick={() => onExport('csv')} className="block w-full px-2 py-1 text-left text-xs hover:bg-hover">Export CSV</button>
           <button onClick={() => onExport('json')} className="block w-full px-2 py-1 text-left text-xs hover:bg-hover">Export JSON</button>
+          <button onClick={onDropColumn} className="block w-full px-2 py-1 text-left text-xs text-error hover:bg-hover">Drop Column</button>
           <button onClick={onDrop} className="block w-full px-2 py-1 text-left text-xs text-error hover:bg-hover">Drop</button>
         </div>
       )}

@@ -25,6 +25,21 @@ type renameRequest struct {
 	NewName string `json:"newName"`
 }
 
+func (s *Server) handleDropColumn(w http.ResponseWriter, r *http.Request) {
+	db, ok := s.mgr.Get(r.PathValue("db"))
+	if !ok {
+		writeErr(w, http.StatusNotFound, errNotFound(r.PathValue("db")))
+		return
+	}
+	confirm := r.URL.Query().Get("confirm")
+	rows, err := db.DropColumn(r.PathValue("table"), r.PathValue("column"), confirm)
+	if err != nil {
+		writeErr(w, http.StatusBadRequest, err)
+		return
+	}
+	writeData(w, map[string]any{"dropped": r.PathValue("column"), "rowsAffected": rows})
+}
+
 func (s *Server) handleRenameTable(w http.ResponseWriter, r *http.Request) {
 	db, ok := s.mgr.Get(r.PathValue("db"))
 	if !ok {

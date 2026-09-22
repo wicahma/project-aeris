@@ -16,6 +16,7 @@ func (s *Server) Routes() http.Handler {
 	mux.HandleFunc("GET /api/v1/databases/{db}/tables/{table}/data", s.handleBrowseTable)
 	mux.HandleFunc("POST /api/v1/databases/{db}/tables/{table}/data/batch", s.handleBatchTable)
 	mux.HandleFunc("DELETE /api/v1/databases/{db}/tables/{table}", s.handleDropTable)
+	mux.HandleFunc("DELETE /api/v1/databases/{db}/tables/{table}/columns/{column}", s.handleDropColumn)
 	mux.HandleFunc("PATCH /api/v1/databases/{db}/tables/{table}", s.handleRenameTable)
 	mux.HandleFunc("GET /api/v1/databases/{db}/indexes", s.handleListIndexes)
 	mux.HandleFunc("POST /api/v1/databases/{db}/indexes", s.handleCreateIndex)

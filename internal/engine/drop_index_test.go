@@ -151,3 +151,68 @@ func TestExplain(t *testing.T) {
 		t.Error("expected parse error")
 	}
 }
+
+func TestDropColumn(t *testing.T) {
+	db, err := Open(t.TempDir(), "dc", true)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+	if err := db.Create(&CreateTableSpec{Name: "t", Columns: []ColumnDef{
+		{Name: "id", Type: "INTEGER", PrimaryKey: true},
+		{Name: "email", Type: "TEXT"},
+		{Name: "name", Type: "TEXT"},
+	}}); err != nil {
+		t.Fatal(err)
+	}
+	db.db.Exec(`INSERT INTO t VALUES (1,'a@x','Alice'),(2,'b@x','Bob'),(3,'c@x','Carol')`)
+
+	if _, err := db.DropColumn("t", "email", "wrong"); err == nil || !strings.Contains(err.Error(), "ERR_CONFIRM_MISMATCH") {
+		t.Errorf("confirm: %v", err)
+	}
+	if _, err := db.DropColumn("t", "id", "id"); err == nil || !strings.Contains(err.Error(), "ERR_PK_DROP") {
+		t.Errorf("pk: %v", err)
+	}
+	if _, err := db.DropColumn("t", "nope", "nope"); err == nil || !strings.Contains(err.Error(), "ERR_INVALID_COLUMN") {
+		t.Errorf("missing col: %v", err)
+	}
+	if _, err := db.DropColumn("nope", "email", "email"); err == nil || !strings.Contains(err.Error(), "ERR_TABLE_NOT_FOUND") {
+		t.Errorf("missing table: %v", err)
+	}
+	if _, err := db.DropColumn("_system_query_history", "id", "id"); err == nil || !strings.Contains(err.Error(), "ERR_TABLE_NAME_RESERVED") {
+		t.Errorf("reserved: %v", err)
+	}
+
+	rows, err := db.DropColumn("t", "email", "email")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if rows != 3 {
+		t.Errorf("rows = %d", rows)
+	}
+	schema, _ := db.Schema()
+	for _, tb := range schema {
+		if tb.Name == "t" {
+			if len(tb.Columns) != 2 {
+				t.Errorf("cols = %v", tb.Columns)
+			}
+		}
+	}
+	var cnt int
+	db.db.QueryRow(`SELECT COUNT(*) FROM t`).Scan(&cnt)
+	if cnt != 3 {
+		t.Errorf("data rows = %d", cnt)
+	}
+}
+
+func TestDropColumnLastColumn(t *testing.T) {
+	db, err := Open(t.TempDir(), "dcl", true)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+	db.Create(&CreateTableSpec{Name: "single", Columns: []ColumnDef{{Name: "a", Type: "TEXT"}}})
+	if _, err := db.DropColumn("single", "a", "a"); err == nil || !strings.Contains(err.Error(), "ERR_LAST_COLUMN") {
+		t.Errorf("last col: %v", err)
+	}
+}
