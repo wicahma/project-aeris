@@ -10,6 +10,10 @@ func (s *Server) Routes() http.Handler {
 	mux.HandleFunc("DELETE /api/v1/databases/{db}", s.handleDetach)
 	mux.HandleFunc("POST /api/v1/databases/{db}/query", s.handleQuery)
 	mux.HandleFunc("GET /api/v1/databases/{db}/schema", s.handleSchema)
+	mux.HandleFunc("GET /api/v1/databases/{db}/queries/history", s.handleListHistory)
+	mux.HandleFunc("GET /api/v1/databases/{db}/queries/saved", s.handleListSaved)
+	mux.HandleFunc("POST /api/v1/databases/{db}/queries/saved", s.handleSaveQuery)
+	mux.HandleFunc("DELETE /api/v1/databases/{db}/queries/saved/{id}", s.handleDeleteSaved)
 	return withCORS(mux)
 }
 

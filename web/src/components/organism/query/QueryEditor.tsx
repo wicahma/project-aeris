@@ -10,6 +10,7 @@ import { islandsDark } from '../../../config/cm-theme.config'
 import { useQueryEditorHooks } from '../../../hooks/page/query/useQueryEditorHooks'
 import { useAerisStore } from '../../../store/aeris.store'
 import { formatDuration } from '../../../utils/format.util'
+import { HistoryPanel } from '../../molecules/HistoryPanel'
 
 export function QueryEditor() {
   const containerRef = useRef<HTMLDivElement>(null)
@@ -106,6 +107,7 @@ export function QueryEditor() {
           {result ? ` · ${formatDuration(result.durationMs)}` : ''}
         </span>
       </div>
+      {activeDb && <HistoryPanel />}
     </section>
   )
 }

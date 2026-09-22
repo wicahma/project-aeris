@@ -36,6 +36,9 @@ type Database struct {
 	Name     string `json:"name"`
 	Path     string `json:"path"`
 	InMemory bool   `json:"inMemory"`
+
+	historyCh chan HistoryEntry
+	stopCh    chan struct{}
 }
 
 func dsn(path string, inMemory bool) string {
@@ -62,22 +65,40 @@ func Open(dataDir, name string, inMemory bool) (*Database, error) {
 		db.Close()
 		return nil, err
 	}
-	return &Database{db: db, Name: name, Path: path, InMemory: inMemory}, nil
+	d := &Database{db: db, Name: name, Path: path, InMemory: inMemory}
+	if err := d.initHistory(); err != nil {
+		db.Close()
+		return nil, err
+	}
+	return d, nil
 }
 
-func (d *Database) Close() error { return d.db.Close() }
+func (d *Database) Close() error {
+	if d.stopCh != nil {
+		close(d.stopCh)
+		d.stopCh = nil
+	}
+	return d.db.Close()
+}
 
 func (d *Database) Query(sqlText string) (*QueryResult, error) {
 	start := time.Now()
 	res := &QueryResult{}
+	var execErr error
+	defer func() {
+		res.DurationMs = float64(time.Since(start).Microseconds()) / 1000
+		d.RecordQuery(sqlText, res, execErr)
+	}()
 	if isReadQuery(sqlText) {
-		rows, err := d.db.Query(sqlText)
-		if err != nil {
-			return nil, err
+		var rows *sql.Rows
+		rows, execErr = d.db.Query(sqlText)
+		if execErr != nil {
+			return nil, execErr
 		}
 		defer rows.Close()
 		cols, err := rows.Columns()
 		if err != nil {
+			execErr = err
 			return nil, err
 		}
 		res.Columns = cols
@@ -88,6 +109,7 @@ func (d *Database) Query(sqlText string) (*QueryResult, error) {
 				ptrs[i] = &vals[i]
 			}
 			if err := rows.Scan(ptrs...); err != nil {
+				execErr = err
 				return nil, err
 			}
 			for i, v := range vals {
@@ -98,16 +120,17 @@ func (d *Database) Query(sqlText string) (*QueryResult, error) {
 			res.Rows = append(res.Rows, vals)
 		}
 		if err := rows.Err(); err != nil {
+			execErr = err
 			return nil, err
 		}
 	} else {
-		r, err := d.db.Exec(sqlText)
-		if err != nil {
-			return nil, err
+		var r sql.Result
+		r, execErr = d.db.Exec(sqlText)
+		if execErr != nil {
+			return nil, execErr
 		}
 		res.RowsAffected, _ = r.RowsAffected()
 	}
-	res.DurationMs = float64(time.Since(start).Microseconds()) / 1000
 	return res, nil
 }
 
@@ -118,7 +141,7 @@ func isReadQuery(q string) bool {
 }
 
 func (d *Database) Schema() ([]Table, error) {
-	rows, err := d.db.Query(`SELECT name, type FROM sqlite_master WHERE type IN ('table','view') AND name NOT LIKE 'sqlite_%' ORDER BY name`)
+	rows, err := d.db.Query(`SELECT name, type FROM sqlite_master WHERE type IN ('table','view') AND name NOT LIKE 'sqlite_%' AND name NOT LIKE '_system_%' ORDER BY name`)
 	if err != nil {
 		return nil, err
 	}
