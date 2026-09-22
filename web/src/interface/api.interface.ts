@@ -59,3 +59,17 @@ export interface IHistoryFilters {
   q?: string
   limit?: number
 }
+
+export interface IIndex {
+  name: string
+  table: string
+  columns: string[]
+  unique: boolean
+}
+
+export interface IExplainNode {
+  id: number
+  parent: number
+  notUsed: number
+  detail: string
+}

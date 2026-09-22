@@ -15,7 +15,7 @@ import { HistoryPanel } from '../../molecules/HistoryPanel'
 export function QueryEditor() {
   const containerRef = useRef<HTMLDivElement>(null)
   const viewRef = useRef<EditorView | null>(null)
-  const { activeTab, activeDb, loading, editorError, handleRun, handleFormat, runSql, updateSql } = useQueryEditorHooks()
+  const { activeTab, activeDb, loading, editorError, handleRun, handleFormat, runSql, updateSql, plan, planError, handleExplain, closePlan } = useQueryEditorHooks()
   const { schema, result } = useAerisStore()
   const runSqlRef = useRef(runSql)
   runSqlRef.current = runSql
@@ -102,12 +102,37 @@ export function QueryEditor() {
         >
           Format (Ctrl+Shift+F)
         </button>
+        <button
+          disabled={!activeDb}
+          onClick={() => void handleExplain()}
+          className="rounded-control px-2 py-1 text-xs text-muted hover:bg-hover hover:text-text disabled:opacity-50"
+        >
+          Explain
+        </button>
         <span className="ml-auto text-xs text-muted">
           {activeDb ? `db: ${activeDb}` : 'no database selected'}
           {result ? ` · ${formatDuration(result.durationMs)}` : ''}
         </span>
       </div>
       {activeDb && <HistoryPanel />}
+      {(plan || planError) && (
+        <div className="border-t border-border bg-panel px-3 py-2">
+          <div className="mb-1 flex items-center justify-between">
+            <span className="text-xs font-semibold text-heading">Query Plan</span>
+            <button onClick={closePlan} className="text-xs text-muted hover:text-text" aria-label="Close plan">×</button>
+          </div>
+          {planError && <p role="alert" className="text-xs text-error">{planError}</p>}
+          {plan && (
+            <ul className="space-y-0.5 text-xs">
+              {plan.map((n) => (
+                <li key={n.id} className="font-mono text-text" style={{ paddingLeft: `${n.parent === 0 ? 0 : 12}px` }}>
+                  <span className="text-muted">#{n.id}</span> {n.detail}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
     </section>
   )
 }

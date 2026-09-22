@@ -1,4 +1,4 @@
-import type { IApiEnvelope, IDatabase, IHistoryEntry, IHistoryFilters, IQueryResult, ISavedQuery, ITable } from '../../interface/api.interface'
+import type { IApiEnvelope, IDatabase, IExplainNode, IHistoryEntry, IHistoryFilters, IIndex, IQueryResult, ISavedQuery, ITable } from '../../interface/api.interface'
 import type { IBatchOp, ITableDataResponse } from '../../utils/data-pending.util'
 
 async function req<T>(path: string, init?: RequestInit): Promise<T> {
@@ -59,4 +59,19 @@ export const api = {
     fetch(`/api/v1/databases/${db}/queries/saved/${id}`, { method: 'DELETE' }).then((res) => {
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
     }),
+  dropTable: (db: string, table: string, confirm: string) =>
+    fetch(`/api/v1/databases/${db}/tables/${table}?confirm=${encodeURIComponent(confirm)}`, { method: 'DELETE' }).then((res) => {
+      if (!res.ok) return res.json().then((b: IApiEnvelope<unknown>) => Promise.reject(new Error(b.error ?? `HTTP ${res.status}`)))
+    }),
+  renameTable: (db: string, table: string, newName: string) =>
+    req<{ renamedTo: string }>(`/databases/${db}/tables/${table}`, { method: 'PATCH', body: JSON.stringify({ newName }) }),
+  listIndexes: (db: string) => req<IIndex[]>(`/databases/${db}/indexes`),
+  createIndex: (db: string, spec: { name: string; table: string; columns: string[]; unique: boolean }) =>
+    req<{ name: string }>(`/databases/${db}/indexes`, { method: 'POST', body: JSON.stringify(spec) }),
+  dropIndex: (db: string, name: string) =>
+    fetch(`/api/v1/databases/${db}/indexes/${name}`, { method: 'DELETE' }).then((res) => {
+      if (!res.ok) return res.json().then((b: IApiEnvelope<unknown>) => Promise.reject(new Error(b.error ?? `HTTP ${res.status}`)))
+    }),
+  explain: (db: string, sql: string) =>
+    req<IExplainNode[]>(`/databases/${db}/explain`, { method: 'POST', body: JSON.stringify({ sql }) }),
 }
