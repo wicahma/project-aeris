@@ -3,11 +3,14 @@ import { DataGrid } from './components/molecules/DataGrid'
 import { EditorTabs } from './components/molecules/EditorTabs'
 import { ObjectTree } from './components/molecules/ObjectTree'
 import { QueryEditor } from './components/organism/query/QueryEditor'
+import { SchemaBuilderDialog } from './components/organism/schema/SchemaBuilderDialog'
+import { useSchemaBuilderHooks } from './hooks/page/schema/useSchemaBuilderHooks'
 import type { ITable } from './interface/api.interface'
 import { useAerisStore } from './store/aeris.store'
 
 function App() {
   const { databases, activeDb, schema, result, error, refreshDatabases, attach, selectDb, runQuery } = useAerisStore()
+  const { setOpen } = useSchemaBuilderHooks()
 
   useEffect(() => {
     refreshDatabases()
@@ -45,6 +48,14 @@ function App() {
         >
           + Attach
         </button>
+        {activeDb && (
+          <button
+            className="rounded-control bg-accent px-2 py-1 text-sm text-white hover:opacity-90"
+            onClick={() => setOpen(true)}
+          >
+            + Table
+          </button>
+        )}
       </header>
 
       <div className="flex min-h-0 flex-1">
@@ -73,6 +84,7 @@ function App() {
       <footer className="border-t border-border bg-panel px-3 py-1 text-xs text-muted">
         {activeDb ? `db: ${activeDb}` : 'no database'} · {schema.length} object(s)
       </footer>
+      <SchemaBuilderDialog />
     </div>
   )
 }

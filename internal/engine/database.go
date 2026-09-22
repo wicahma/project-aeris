@@ -190,3 +190,60 @@ func (d *Database) columns(table string) ([]Column, error) {
 	}
 	return cols, rows.Err()
 }
+
+// Create implements SD-001/SD-002 (visual schema builder, ponytail scope):
+// CREATE TABLE + ALTER ADD COLUMN only. Rebuilds/drop/FK-graph are separate specs.
+func (d *Database) Create(spec *CreateTableSpec) error {
+	if err := spec.Validate(); err != nil {
+		return err
+	}
+	existing, err := d.Schema()
+	if err != nil {
+		return err
+	}
+	if err := spec.ValidateAgainstSchema(existing); err != nil {
+		return err
+	}
+	_, err = d.db.Exec(spec.DDL())
+	if err != nil {
+		if strings.Contains(err.Error(), "already exists") {
+			return fmt.Errorf("ERR_TABLE_NAME_DUPLICATE: Table %q already exists in this database", spec.Name)
+		}
+		return err
+	}
+	return nil
+}
+
+type AddColumnSpec struct {
+	Table  string    `json:"table"`
+	Column ColumnDef `json:"column"`
+}
+
+func (d *Database) AddColumn(spec *AddColumnSpec) error {
+	if err := ValidateIdent(spec.Table); err != nil {
+		return fmt.Errorf("ERR_TABLE_NAME_INVALID: %w", err)
+	}
+	col := spec.Column
+	if err := ValidateIdent(col.Name); err != nil {
+		return fmt.Errorf("ERR_COLUMN_NAME_INVALID: %w", err)
+	}
+	t := strings.ToUpper(col.Type)
+	if !sqliteAffinities[t] {
+		return fmt.Errorf("ERR_TYPE_UNSUPPORTED: Type must be one of INTEGER, TEXT, REAL, BLOB")
+	}
+	col.Type = t
+	if col.PrimaryKey {
+		return fmt.Errorf("ERR_PK_ON_ADD: PRIMARY KEY cannot be added to an existing table via ALTER")
+	}
+	ddl := fmt.Sprintf(`ALTER TABLE "%s" ADD COLUMN %s`, spec.Table, col.SQL())
+	if _, err := d.db.Exec(ddl); err != nil {
+		if strings.Contains(err.Error(), "duplicate column name") {
+			return fmt.Errorf("ERR_DUPLICATE_COLUMN: Column %q already exists", spec.Column.Name)
+		}
+		if strings.Contains(err.Error(), "no such table") {
+			return fmt.Errorf("ERR_TABLE_NOT_FOUND: Table %q does not exist", spec.Table)
+		}
+		return err
+	}
+	return nil
+}

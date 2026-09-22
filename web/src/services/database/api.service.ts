@@ -36,6 +36,10 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ title, category, queryText }),
     }),
+  createTable: (db: string, spec: unknown) =>
+    req<{ name: string }>(`/databases/${db}/schema/table`, { method: 'POST', body: JSON.stringify(spec) }),
+  addColumn: (db: string, table: string, col: unknown) =>
+    req<{ added: boolean }>(`/databases/${db}/schema/table/${table}/column`, { method: 'POST', body: JSON.stringify(col) }),
   deleteSaved: (db: string, id: string) =>
     fetch(`/api/v1/databases/${db}/queries/saved/${id}`, { method: 'DELETE' }).then((res) => {
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
