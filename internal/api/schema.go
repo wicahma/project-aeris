@@ -43,3 +43,22 @@ func (s *Server) handleAddColumn(w http.ResponseWriter, r *http.Request) {
 	}
 	writeJSON(w, http.StatusCreated, envelope{Data: map[string]any{"table": spec.Table, "column": spec.Column.Name, "added": true}})
 }
+
+func (s *Server) handleAlterColumn(w http.ResponseWriter, r *http.Request) {
+	db, ok := s.mgr.Get(r.PathValue("db"))
+	if !ok {
+		writeErr(w, http.StatusNotFound, errNotFound(r.PathValue("db")))
+		return
+	}
+	var spec engine.AlterColumnSpec
+	if err := json.NewDecoder(r.Body).Decode(&spec); err != nil {
+		writeErr(w, http.StatusBadRequest, err)
+		return
+	}
+	spec.Table = r.PathValue("table")
+	if err := db.AlterColumn(&spec); err != nil {
+		writeErr(w, http.StatusBadRequest, err)
+		return
+	}
+	writeData(w, map[string]any{"altered": true, "table": spec.Table, "column": spec.Column})
+}
