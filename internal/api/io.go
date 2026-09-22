@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/wicahma/aeris/internal/engine"
@@ -55,6 +56,56 @@ func (s *Server) handleImport(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	writeData(w, res)
+}
+
+func (s *Server) handleImportAsync(w http.ResponseWriter, r *http.Request) {
+	name := r.PathValue("db")
+	db, ok := s.mgr.Get(name)
+	if !ok {
+		writeErr(w, http.StatusNotFound, errNotFound(name))
+		return
+	}
+	table := r.PathValue("table")
+
+	r.Body = http.MaxBytesReader(w, r.Body, engine.ImportMaxBytes+64<<10)
+	var body importBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		var mbe *http.MaxBytesError
+		if errors.As(err, &mbe) {
+			writeErr(w, http.StatusRequestEntityTooLarge, fmt.Errorf("ERR_FILE_TOO_LARGE: import exceeds %d bytes", engine.ImportMaxBytes))
+			return
+		}
+		writeErr(w, http.StatusBadRequest, fmt.Errorf("ERR_INVALID_JSON: %v", err))
+		return
+	}
+
+	job := s.jobs.StartImport(db, table, body.Data, &engine.ImportSpec{
+		Table:             table,
+		Columns:           body.Columns,
+		Delimiter:         body.Delimiter,
+		HasHeader:         body.HasHeader,
+		DuplicateStrategy: body.DuplicateStrategy,
+	})
+	w.WriteHeader(http.StatusAccepted)
+	writeData(w, job)
+}
+
+func (s *Server) handleListJobs(w http.ResponseWriter, r *http.Request) {
+	writeData(w, s.jobs.List())
+}
+
+func (s *Server) handleGetJob(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.ParseInt(r.PathValue("id"), 10, 64)
+	if err != nil {
+		writeErr(w, http.StatusBadRequest, fmt.Errorf("ERR_INVALID_ID: %v", err))
+		return
+	}
+	job := s.jobs.Get(id)
+	if job == nil {
+		writeErr(w, http.StatusNotFound, fmt.Errorf("ERR_JOB_NOT_FOUND: %d", id))
+		return
+	}
+	writeData(w, job)
 }
 
 func (s *Server) handleExport(w http.ResponseWriter, r *http.Request) {

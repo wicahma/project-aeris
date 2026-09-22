@@ -8,11 +8,12 @@ import (
 )
 
 type Server struct {
-	mgr *engine.Manager
+	mgr  *engine.Manager
+	jobs *engine.JobRunner
 }
 
 func NewServer(mgr *engine.Manager) *Server {
-	return &Server{mgr: mgr}
+	return &Server{mgr: mgr, jobs: engine.NewJobRunner()}
 }
 
 type attachRequest struct {
