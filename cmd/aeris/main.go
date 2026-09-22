@@ -45,13 +45,20 @@ func serve(args []string) {
 	defer mgr.Close()
 
 	srv := api.NewServer(mgr)
-	mux := http.NewServeMux()
-	mux.Handle("/api/", srv.Routes())
 	dist, err := fs.Sub(web.Dist, "dist")
 	if err != nil {
 		log.Fatalf("embed dist: %v", err)
 	}
-	mux.Handle("/", spaHandler(dist))
+	spa := spaHandler(dist)
+	apiHandler := srv.Routes()
+	mux := http.NewServeMux()
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		if len(r.URL.Path) >= 5 && r.URL.Path[:5] == "/api/" {
+			apiHandler.ServeHTTP(w, r)
+			return
+		}
+		spa.ServeHTTP(w, r)
+	})
 
 	addr := fmt.Sprintf(":%d", *port)
 	log.Printf("aeris listening on %s (data: %s)", addr, *dataDir)
