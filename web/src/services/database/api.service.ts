@@ -55,6 +55,11 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ operations }),
     }),
+  updateCell: (db: string, table: string, body: { rowId: number; column: string; value: unknown }) =>
+    req<{ applied: number }>(`/databases/${db}/tables/${table}/data`, {
+      method: 'PATCH',
+      body: JSON.stringify(body),
+    }),
   deleteSaved: (db: string, id: string) =>
     fetch(`/api/v1/databases/${db}/queries/saved/${id}`, { method: 'DELETE' }).then((res) => {
       if (!res.ok) throw new Error(`HTTP ${res.status}`)

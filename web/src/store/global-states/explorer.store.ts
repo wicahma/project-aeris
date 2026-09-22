@@ -15,6 +15,7 @@ interface IExplorerState {
   close: () => void
   setPage: (db: string, page: number) => Promise<void>
   editCell: (rowId: number, column: string, value: unknown) => void
+  saveCell: (db: string, rowId: number, column: string, value: unknown) => Promise<void>
   addRow: () => void
   setInsertValue: (idx: number, column: string, value: unknown) => void
   removeInsert: (idx: number) => void
@@ -58,6 +59,20 @@ export const useExplorerStore = create<IExplorerState>((set, get) => ({
   },
 
   editCell: (rowId, column, value) => set((s) => ({ pending: addEdit(s.pending, { rowId, column, value }) })),
+
+  saveCell: async (db, rowId, column, value) => {
+    const { table, page, pageSize } = get()
+    if (!table) return
+    set({ committing: true, error: null })
+    try {
+      await api.updateCell(db, table, { rowId, column, value })
+      const data = await api.browseTable(db, table, { page, page_size: pageSize })
+      set({ data, committing: false })
+    } catch (e) {
+      set({ error: (e as Error).message, committing: false })
+      throw e
+    }
+  },
 
   addRow: () => set((s) => ({ pending: { ...s.pending, inserts: [...s.pending.inserts, {}] } })),
 
