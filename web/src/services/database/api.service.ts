@@ -19,8 +19,8 @@ export const api = {
   attach: (name: string, inMemory: boolean) =>
     req<IDatabase>('/databases', { method: 'POST', body: JSON.stringify({ name, inMemory }) }),
   detach: (name: string) => req<{ detached: string }>(`/databases/${name}`, { method: 'DELETE' }),
-  query: (db: string, sql: string) =>
-    req<IQueryResult>(`/databases/${db}/query`, { method: 'POST', body: JSON.stringify({ sql }) }),
+  query: (db: string, sql: string, signal?: AbortSignal) =>
+    req<IQueryResult>(`/databases/${db}/query`, { method: 'POST', body: JSON.stringify({ sql }), signal }),
   schema: (db: string) => req<ITable[]>(`/databases/${db}/schema`),
   history: (db: string, filters: IHistoryFilters = {}) => {
     const params = new URLSearchParams()

@@ -26,3 +26,11 @@ if (typeof window !== 'undefined' && !window.localStorage) {
     configurable: true,
   })
 }
+
+if (typeof window !== 'undefined' && !('ResizeObserver' in window)) {
+  ;(window as unknown as { ResizeObserver: unknown }).ResizeObserver = class {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  }
+}

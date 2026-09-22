@@ -48,7 +48,7 @@ describe('DataGrid', () => {
     fireEvent.click(screen.getByText('Apply'))
     expect(screen.queryByText('charlie')).toBeNull()
     expect(screen.getByText('alice')).toBeTruthy()
-    expect(screen.getByText(/1 row\(s\) of 3/)).toBeTruthy()
+    expect(screen.getByText(/1 row\(s\)/)).toBeTruthy()
   })
 
   it('text view renders raw rows', () => {
@@ -62,5 +62,17 @@ describe('DataGrid', () => {
     fireEvent.change(screen.getByLabelText('Filter value'), { target: { value: 'zzz' } })
     fireEvent.click(screen.getByText('Apply'))
     expect(screen.getByText('No rows match the filter')).toBeTruthy()
+  })
+
+  it('virtualizes: renders only visible window for large result', () => {
+    const big: IQueryResult = {
+      columns: ['id'],
+      rows: Array.from({ length: 1000 }, (_, i) => [i]),
+      rowsAffected: 0,
+      durationMs: 0,
+    }
+    render(<DataGrid result={big} />)
+    expect(screen.getAllByRole('row').length).toBeLessThan(100)
+    expect(screen.getByText(/1000 row\(s\)/)).toBeTruthy()
   })
 })

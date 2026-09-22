@@ -1,6 +1,7 @@
 package engine
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"path/filepath"
@@ -82,6 +83,14 @@ func (d *Database) Close() error {
 }
 
 func (d *Database) Query(sqlText string) (*QueryResult, error) {
+	return d.QueryCtx(context.Background(), sqlText)
+}
+
+// QueryCtx implements QE-003 subset: context-aware query — client cancel
+// (browser tab close, cancel button) kills the sqlite operation via
+// QueryContext/ExecContext. ponytail: no explicit cancel endpoint yet; HTTP
+// ctx propagation covers it. Add explicit /query/cancel if needed.
+func (d *Database) QueryCtx(ctx context.Context, sqlText string) (*QueryResult, error) {
 	start := time.Now()
 	res := &QueryResult{}
 	var execErr error
@@ -91,7 +100,7 @@ func (d *Database) Query(sqlText string) (*QueryResult, error) {
 	}()
 	if isReadQuery(sqlText) {
 		var rows *sql.Rows
-		rows, execErr = d.db.Query(sqlText)
+		rows, execErr = d.db.QueryContext(ctx, sqlText)
 		if execErr != nil {
 			return nil, execErr
 		}
@@ -125,7 +134,7 @@ func (d *Database) Query(sqlText string) (*QueryResult, error) {
 		}
 	} else {
 		var r sql.Result
-		r, execErr = d.db.Exec(sqlText)
+		r, execErr = d.db.ExecContext(ctx, sqlText)
 		if execErr != nil {
 			return nil, execErr
 		}

@@ -109,6 +109,14 @@ export function QueryEditor() {
         >
           Explain
         </button>
+        {loading && (
+          <button
+            onClick={() => useAerisStore.getState().cancelQuery()}
+            className="rounded-control px-2 py-1 text-xs text-error hover:bg-hover"
+          >
+            Cancel
+          </button>
+        )}
         <span className="ml-auto text-xs text-muted">
           {activeDb ? `db: ${activeDb}` : 'no database selected'}
           {result ? ` · ${formatDuration(result.durationMs)}` : ''}

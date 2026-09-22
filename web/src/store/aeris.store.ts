@@ -14,9 +14,12 @@ interface IAerisState {
   detach: (name: string) => Promise<void>
   selectDb: (name: string) => Promise<void>
   runQuery: (sql: string) => Promise<void>
+  cancelQuery: () => void
 }
 
-export const useAerisStore = create<IAerisState>((set, get) => ({
+export const useAerisStore = create<IAerisState>((set, get) => {
+  let queryAbort: AbortController | null = null
+  return {
   databases: [],
   activeDb: null,
   schema: [],
@@ -60,17 +63,28 @@ export const useAerisStore = create<IAerisState>((set, get) => ({
   runQuery: async (sql) => {
     const { activeDb } = get()
     if (!activeDb) return
+    queryAbort?.abort()
+    queryAbort = new AbortController()
     set({ loading: true, error: null })
     try {
-      const result = await api.query(activeDb, sql)
+      const result = await api.query(activeDb, sql, queryAbort.signal)
       set({ result })
       if (!/^\s*(select|pragma|explain|with)/i.test(sql)) {
         set({ schema: await api.schema(activeDb) })
       }
     } catch (e) {
-      set({ error: (e as Error).message })
+      if ((e as Error).name === 'AbortError') {
+        set({ error: 'ERR_CANCELLED: Query cancelled' })
+      } else {
+        set({ error: (e as Error).message })
+      }
     } finally {
       set({ loading: false })
+      queryAbort = null
     }
   },
-}))
+
+  cancelQuery: () => {
+    queryAbort?.abort()
+  },
+}})

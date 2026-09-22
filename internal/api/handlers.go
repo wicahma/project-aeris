@@ -67,7 +67,7 @@ func (s *Server) handleQuery(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, http.StatusBadRequest, err)
 		return
 	}
-	res, err := db.Query(req.SQL)
+	res, err := db.QueryCtx(r.Context(), req.SQL)
 	if err != nil {
 		writeErr(w, http.StatusBadRequest, err)
 		return
