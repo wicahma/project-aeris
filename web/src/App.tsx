@@ -3,21 +3,24 @@ import { DataGrid } from './components/molecules/DataGrid'
 import { EditorTabs } from './components/molecules/EditorTabs'
 import { ObjectTree } from './components/molecules/ObjectTree'
 import { QueryEditor } from './components/organism/query/QueryEditor'
+import { DataExplorer } from './components/organism/explorer/DataExplorer'
 import { SchemaBuilderDialog } from './components/organism/schema/SchemaBuilderDialog'
 import { useSchemaBuilderHooks } from './hooks/page/schema/useSchemaBuilderHooks'
 import type { ITable } from './interface/api.interface'
 import { useAerisStore } from './store/aeris.store'
+import { useExplorerStore } from './store/global-states/explorer.store'
 
 function App() {
-  const { databases, activeDb, schema, result, error, refreshDatabases, attach, selectDb, runQuery } = useAerisStore()
+  const { databases, activeDb, schema, result, error, refreshDatabases, attach, selectDb } = useAerisStore()
   const { setOpen } = useSchemaBuilderHooks()
+  const { table: explorerTable, openTable } = useExplorerStore()
 
   useEffect(() => {
     refreshDatabases()
   }, [refreshDatabases])
 
   const onSelectTable = (t: ITable) => {
-    runQuery(`SELECT * FROM "${t.name}" LIMIT 200`)
+    if (activeDb) void openTable(activeDb, t.name)
   }
 
   return (
@@ -72,10 +75,12 @@ function App() {
             </div>
           )}
           <div className="min-h-0 flex-1 overflow-hidden bg-canvas">
-            {result ? (
+            {explorerTable ? (
+              <DataExplorer />
+            ) : result ? (
               <DataGrid result={result} />
             ) : (
-              <p className="p-4 text-sm text-disabled">Run a query to see results</p>
+              <p className="p-4 text-sm text-disabled">Run a query or click a table to see results</p>
             )}
           </div>
         </main>

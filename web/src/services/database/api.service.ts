@@ -1,4 +1,5 @@
 import type { IApiEnvelope, IDatabase, IHistoryEntry, IHistoryFilters, IQueryResult, ISavedQuery, ITable } from '../../interface/api.interface'
+import type { IBatchOp, ITableDataResponse } from '../../utils/data-pending.util'
 
 async function req<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`/api/v1${path}`, {
@@ -40,6 +41,20 @@ export const api = {
     req<{ name: string }>(`/databases/${db}/schema/table`, { method: 'POST', body: JSON.stringify(spec) }),
   addColumn: (db: string, table: string, col: unknown) =>
     req<{ added: boolean }>(`/databases/${db}/schema/table/${table}/column`, { method: 'POST', body: JSON.stringify(col) }),
+  browseTable: (db: string, table: string, params: { page?: number; page_size?: number; sort?: string[]; filter?: string[] } = {}) => {
+    const qs = new URLSearchParams()
+    if (params.page) qs.set('page', String(params.page))
+    if (params.page_size) qs.set('page_size', String(params.page_size))
+    for (const s of params.sort ?? []) qs.append('sort', s)
+    for (const f of params.filter ?? []) qs.append('filter', f)
+    const s = qs.toString()
+    return req<ITableDataResponse>(`/databases/${db}/tables/${table}/data${s ? `?${s}` : ''}`)
+  },
+  batchTable: (db: string, table: string, operations: IBatchOp[]) =>
+    req<{ applied: number }>(`/databases/${db}/tables/${table}/data/batch`, {
+      method: 'POST',
+      body: JSON.stringify({ operations }),
+    }),
   deleteSaved: (db: string, id: string) =>
     fetch(`/api/v1/databases/${db}/queries/saved/${id}`, { method: 'DELETE' }).then((res) => {
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
