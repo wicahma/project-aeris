@@ -3,6 +3,8 @@ package api
 import (
 	"encoding/json"
 	"net/http"
+	"os"
+	"strings"
 
 	"github.com/wicahma/aeris/internal/engine"
 )
@@ -10,10 +12,11 @@ import (
 type Server struct {
 	mgr  *engine.Manager
 	jobs *engine.JobRunner
+	auth bool
 }
 
 func NewServer(mgr *engine.Manager) *Server {
-	return &Server{mgr: mgr, jobs: engine.NewJobRunner()}
+	return &Server{mgr: mgr, jobs: engine.NewJobRunner(), auth: os.Getenv("AERIS_AUTH") == "1"}
 }
 
 type attachRequest struct {
@@ -29,6 +32,38 @@ type queryRequest struct {
 
 func (s *Server) handleHealth(w http.ResponseWriter, r *http.Request) {
 	writeData(w, map[string]string{"status": "ok"})
+}
+
+// authMiddleware checks API key if AERIS_AUTH=1. Skipped for /auth/keys
+// (bootstrap) and when auth disabled (default single-user localhost).
+func (s *Server) authMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if !s.auth || r.URL.Path == "/api/v1/health" || strings.HasPrefix(r.URL.Path, "/api/v1/auth/") || strings.Contains(r.URL.Path, "/auth/keys") || (r.URL.Path == "/api/v1/databases" && r.Method == "POST") {
+			next.ServeHTTP(w, r)
+			return
+		}
+		key := r.Header.Get("Authorization")
+		if key == "" {
+			key = r.URL.Query().Get("apikey")
+		}
+		if key == "" {
+			writeErr(w, http.StatusUnauthorized, errString("ERR_AUTH_REQUIRED: API key required"))
+			return
+		}
+		key = strings.TrimPrefix(key, "Bearer ")
+		// Try each attached DB until one validates the key
+		for _, name := range s.mgr.List() {
+			db, ok := s.mgr.Get(name)
+			if !ok {
+				continue
+			}
+			if _, err := db.ValidateAPIKey(key); err == nil {
+				next.ServeHTTP(w, r)
+				return
+			}
+		}
+		writeErr(w, http.StatusUnauthorized, errString("ERR_AUTH_INVALID: Invalid API key"))
+	})
 }
 
 func (s *Server) handleListDatabases(w http.ResponseWriter, r *http.Request) {

@@ -78,6 +78,10 @@ func Open(dataDir, name string, inMemory bool) (*Database, error) {
 		db.Close()
 		return nil, err
 	}
+	if err := d.initAPIKeys(); err != nil {
+		db.Close()
+		return nil, err
+	}
 	return d, nil
 }
 

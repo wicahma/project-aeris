@@ -6,6 +6,12 @@ func (s *Server) Routes() http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /api/v1/health", s.handleHealth)
 	mux.HandleFunc("GET /api/v1/databases", s.handleListDatabases)
+	mux.HandleFunc("POST /api/v1/auth/keys", s.handleCreateAPIKey)
+	mux.HandleFunc("GET /api/v1/auth/keys", s.handleListAPIKeys)
+	mux.HandleFunc("DELETE /api/v1/auth/keys/{id}", s.handleDeleteAPIKey)
+	mux.HandleFunc("POST /api/v1/databases/{db}/auth/keys", s.handleCreateAPIKey)
+	mux.HandleFunc("GET /api/v1/databases/{db}/auth/keys", s.handleListAPIKeys)
+	mux.HandleFunc("DELETE /api/v1/databases/{db}/auth/keys/{id}", s.handleDeleteAPIKey)
 	mux.HandleFunc("POST /api/v1/databases", s.handleAttach)
 	mux.HandleFunc("DELETE /api/v1/databases/{db}", s.handleDetach)
 	mux.HandleFunc("POST /api/v1/databases/{db}/query", s.handleQuery)
@@ -38,7 +44,7 @@ func (s *Server) Routes() http.Handler {
 	mux.HandleFunc("GET /api/v1/databases/{db}/queries/saved", s.handleListSaved)
 	mux.HandleFunc("POST /api/v1/databases/{db}/queries/saved", s.handleSaveQuery)
 	mux.HandleFunc("DELETE /api/v1/databases/{db}/queries/saved/{id}", s.handleDeleteSaved)
-	return withCORS(mux)
+	return withCORS(s.authMiddleware(mux))
 }
 
 func withCORS(next http.Handler) http.Handler {
