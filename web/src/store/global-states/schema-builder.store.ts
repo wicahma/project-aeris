@@ -4,7 +4,7 @@ import { api } from '../../services/database/api.service'
 import { useAerisStore } from '../aeris.store'
 
 function emptyColumn(name = ''): IColumnSpec {
-  return { name, type: 'TEXT', notNull: false, primaryKey: false, unique: false, defaultValue: null }
+  return { name, type: 'TEXT', notNull: false, primaryKey: false, unique: false, defaultValue: null, referencesTable: '', referencesColumn: '', onDelete: '' }
 }
 
 function initial(): ITableSpec {

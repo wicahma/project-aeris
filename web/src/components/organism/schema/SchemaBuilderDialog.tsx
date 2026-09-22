@@ -29,11 +29,11 @@ export function SchemaBuilderDialog() {
         )}
 
         <div className="mb-1 mt-3 grid grid-cols-[1fr_100px_60px_60px_40px_40px] items-center gap-1 text-xs text-muted">
-          <span>Column</span><span>Type</span><span>PK</span><span>NN</span><span>UQ</span><span />
+          <span>Column</span><span>Type</span><span>PK</span><span>NN</span><span>UQ</span><span>FK</span><span />
         </div>
         <div className="flex-1 overflow-y-auto">
           {spec.columns.map((c, i) => (
-            <div key={i} className="mb-1 grid grid-cols-[1fr_100px_60px_60px_40px_40px] items-center gap-1">
+            <div key={i} className="mb-1 grid grid-cols-[1fr_100px_60px_60px_40px_40px_40px] items-center gap-1">
               <input
                 aria-label={`Column ${i + 1} name`}
                 value={c.name}
@@ -51,6 +51,21 @@ export function SchemaBuilderDialog() {
               <input type="checkbox" aria-label={`Column ${i + 1} primary key`} checked={c.primaryKey} onChange={(e) => setColumn(i, { primaryKey: e.target.checked })} />
               <input type="checkbox" aria-label={`Column ${i + 1} not null`} checked={c.notNull} onChange={(e) => setColumn(i, { notNull: e.target.checked })} />
               <input type="checkbox" aria-label={`Column ${i + 1} unique`} checked={c.unique} onChange={(e) => setColumn(i, { unique: e.target.checked })} />
+              <input
+                aria-label={`Column ${i + 1} foreign key`}
+                placeholder="tbl.col"
+                value={c.referencesTable ? `${c.referencesTable}.${c.referencesColumn}` : ''}
+                onChange={(e) => {
+                  const v = e.target.value
+                  if (!v) {
+                    setColumn(i, { referencesTable: '', referencesColumn: '' })
+                    return
+                  }
+                  const [rt, rc] = v.split('.')
+                  if (rt && rc) setColumn(i, { referencesTable: rt, referencesColumn: rc })
+                }}
+                className="w-20 rounded-control border border-border bg-panel px-1 py-1 text-xs"
+              />
               <button
                 onClick={() => removeColumn(i)}
                 disabled={spec.columns.length === 1}

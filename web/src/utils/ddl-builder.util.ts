@@ -5,6 +5,9 @@ export interface IColumnSpec {
   primaryKey: boolean
   unique: boolean
   defaultValue: string | null
+  referencesTable?: string
+  referencesColumn?: string
+  onDelete?: string
 }
 
 export interface ITableSpec {
@@ -44,6 +47,10 @@ function columnSql(c: IColumnSpec): string {
   else if (c.notNull) parts.push('NOT NULL')
   if (c.unique) parts.push('UNIQUE')
   if (c.defaultValue) parts.push(`DEFAULT ${c.defaultValue}`)
+  if (c.referencesTable && c.referencesColumn) {
+    parts.push(`REFERENCES "${c.referencesTable}"("${c.referencesColumn}")`)
+    if (c.onDelete) parts.push(`ON DELETE ${c.onDelete}`)
+  }
   return parts.join(' ')
 }
 
