@@ -1,4 +1,4 @@
-import type { IApiEnvelope, IDatabase, IExplainNode, IHistoryEntry, IHistoryFilters, IImportResult, IImportSpec, IIndex, IQueryResult, ISavedQuery, ITable } from '../../interface/api.interface'
+import type { IAdvisorReport, IApiEnvelope, IDatabase, IExplainNode, IHistoryEntry, IHistoryFilters, IImportResult, IImportSpec, IIndex, IQueryResult, ISavedQuery, ITable } from '../../interface/api.interface'
 import type { IBatchOp, ITableDataResponse } from '../../utils/data-pending.util'
 
 async function req<T>(path: string, init?: RequestInit): Promise<T> {
@@ -82,4 +82,6 @@ export const api = {
     req<IImportResult>(`/databases/${db}/tables/${table}/import`, { method: 'POST', body: JSON.stringify(spec) }),
   exportUrl: (db: string, table: string, format: 'csv' | 'json'): string =>
     `/api/v1/databases/${db}/tables/${table}/export?format=${format}`,
+  indexAdvisor: (db: string, table: string) =>
+    req<IAdvisorReport>(`/databases/${db}/tables/${table}/advisor`),
 }

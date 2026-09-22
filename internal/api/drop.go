@@ -40,6 +40,20 @@ func (s *Server) handleDropColumn(w http.ResponseWriter, r *http.Request) {
 	writeData(w, map[string]any{"dropped": r.PathValue("column"), "rowsAffected": rows})
 }
 
+func (s *Server) handleIndexAdvisor(w http.ResponseWriter, r *http.Request) {
+	db, ok := s.mgr.Get(r.PathValue("db"))
+	if !ok {
+		writeErr(w, http.StatusNotFound, errNotFound(r.PathValue("db")))
+		return
+	}
+	rep, err := db.IndexAdvisor(r.PathValue("table"))
+	if err != nil {
+		writeErr(w, http.StatusBadRequest, err)
+		return
+	}
+	writeData(w, rep)
+}
+
 func (s *Server) handleRenameTable(w http.ResponseWriter, r *http.Request) {
 	db, ok := s.mgr.Get(r.PathValue("db"))
 	if !ok {

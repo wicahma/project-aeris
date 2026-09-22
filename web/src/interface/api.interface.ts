@@ -89,3 +89,16 @@ export interface IImportResult {
   failedRows: number
   errors?: Array<{ row: number; message: string }>
 }
+
+export interface IAdvisorRecommend {
+  columns: string[]
+  reason: string
+}
+
+export interface IAdvisorReport {
+  table: string
+  queries: number
+  scans: number
+  recommend: IAdvisorRecommend[]
+  generated: string
+}

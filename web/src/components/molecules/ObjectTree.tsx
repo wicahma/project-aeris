@@ -39,6 +39,21 @@ function TableRow({ t, onSelect }: { t: ITable; onSelect: (t: ITable) => void })
     void act(() => api.createIndex(activeDb, { name, table: t.name, columns: colList, unique: false }))
   }
 
+  const onAdvisor = async () => {
+    if (!activeDb) return
+    setMenu(false)
+    try {
+      const rep = await api.indexAdvisor(activeDb, t.name)
+      const recs = rep.recommend.map((r) => `• ${r.columns.join(', ')}: ${r.reason}`).join('\n')
+      window.alert(
+        `Index Advisor: ${t.name}\nQueries analyzed: ${rep.queries} | Full scans: ${rep.scans}\n\n` +
+          (recs || 'No recommendations — all good.'),
+      )
+    } catch (e) {
+      setError((e as Error).message)
+    }
+  }
+
   const onDropColumn = () => {
     if (!activeDb) return
     const colNames = t.columns.map((c) => c.name).join(', ')
@@ -110,6 +125,7 @@ function TableRow({ t, onSelect }: { t: ITable; onSelect: (t: ITable) => void })
           <button onClick={onImport} className="block w-full px-2 py-1 text-left text-xs hover:bg-hover">Import CSV</button>
           <button onClick={() => onExport('csv')} className="block w-full px-2 py-1 text-left text-xs hover:bg-hover">Export CSV</button>
           <button onClick={() => onExport('json')} className="block w-full px-2 py-1 text-left text-xs hover:bg-hover">Export JSON</button>
+          <button onClick={onAdvisor} className="block w-full px-2 py-1 text-left text-xs hover:bg-hover">Advisor</button>
           <button onClick={onDropColumn} className="block w-full px-2 py-1 text-left text-xs text-error hover:bg-hover">Drop Column</button>
           <button onClick={onDrop} className="block w-full px-2 py-1 text-left text-xs text-error hover:bg-hover">Drop</button>
         </div>
