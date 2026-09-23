@@ -23,3 +23,7 @@ func ReservedIdent(name string) bool {
 func QuoteIdent(name string) string {
 	return `"` + strings.ReplaceAll(name, `"`, `""`) + `"`
 }
+
+func QuoteLiteral(v string) string {
+	return `'` + strings.ReplaceAll(v, `'`, `''`) + `'`
+}
