@@ -2,11 +2,22 @@ import type { IAdvisorReport, IApiEnvelope, IDatabase, IExplainNode, IHistoryEnt
 import type { IBatchOp, ITableDataResponse } from '../../utils/data-pending.util'
 
 async function req<T>(path: string, init?: RequestInit): Promise<T> {
+  const key = localStorage.getItem('aeris_api_key')
   const res = await fetch(`/api/v1${path}`, {
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      ...(key ? { Authorization: `Bearer ${key}` } : {}),
+    },
     ...init,
   })
   const body = (await res.json()) as IApiEnvelope<T>
+  if (res.status === 401) {
+    const k = window.prompt('API key required:')
+    if (k) {
+      localStorage.setItem('aeris_api_key', k)
+      return req(path, init)
+    }
+  }
   if (!res.ok || body.error) {
     throw new Error(body.error ?? `HTTP ${res.status}`)
   }
