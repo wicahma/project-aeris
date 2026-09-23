@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { formatTimestamp } from '../../utils/format-timestamp.util'
 import { useHistoryPanelHooks } from '../../hooks/page/query/useHistoryPanelHooks'
 import { useAerisStore } from '../../store/aeris.store'
+import { getStoredKey } from '../../utils/auth-storage.util'
 import type { IHistoryEntry } from '../../interface/api.interface'
 
 const STATUS_COLOR: Record<string, string> = {
@@ -48,7 +49,10 @@ function MigrationList() {
   useEffect(() => {
     if (!activeDb) return
     setLoading(true)
-    fetch(`/api/v1/databases/${activeDb}/migrations`)
+    const k = getStoredKey()
+    fetch(`/api/v1/databases/${activeDb}/migrations`, {
+      headers: k ? { Authorization: `Bearer ${k}` } : {},
+    })
       .then((r) => r.json())
       .then((b) => setMigrations(b.data ?? []))
       .catch(() => setMigrations([]))
@@ -82,7 +86,10 @@ function APIKeyList() {
   const load = () => {
     if (!activeDb) return
     setLoading(true)
-    fetch(`/api/v1/databases/${activeDb}/auth/keys`)
+    const k = getStoredKey()
+    fetch(`/api/v1/databases/${activeDb}/auth/keys`, {
+      headers: k ? { Authorization: `Bearer ${k}` } : {},
+    })
       .then((r) => r.json())
       .then((b) => setKeys(b.data ?? []))
       .catch(() => setKeys([]))
@@ -94,9 +101,13 @@ function APIKeyList() {
   const createKey = () => {
     const name = prompt('Key name:')
     if (!name || !activeDb) return
+    const k = getStoredKey()
     fetch(`/api/v1/databases/${activeDb}/auth/keys`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        ...(k ? { Authorization: `Bearer ${k}` } : {}),
+      },
       body: JSON.stringify({ name }),
     })
       .then((r) => r.json())
@@ -108,7 +119,11 @@ function APIKeyList() {
 
   const deleteKey = (id: number) => {
     if (!activeDb || !confirm('Delete this key?')) return
-    fetch(`/api/v1/databases/${activeDb}/auth/keys/${id}`, { method: 'DELETE' }).then(load)
+    const k = getStoredKey()
+    fetch(`/api/v1/databases/${activeDb}/auth/keys/${id}`, {
+      method: 'DELETE',
+      headers: k ? { Authorization: `Bearer ${k}` } : {},
+    }).then(load)
   }
 
   if (loading) return <div className="px-2 py-2 text-xs text-muted">Loading…</div>

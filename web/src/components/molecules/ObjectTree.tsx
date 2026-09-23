@@ -2,13 +2,17 @@ import { useState, useEffect } from 'react'
 import type { ITable } from '../../interface/api.interface'
 import { api } from '../../services/database/api.service'
 import { useAerisStore } from '../../store/aeris.store'
+import { getStoredKey } from '../../utils/auth-storage.util'
 
 function useCatalogDrift() {
   const { activeDb } = useAerisStore()
   const [drift, setDrift] = useState(false)
   useEffect(() => {
     if (!activeDb) return
-    fetch(`/api/v1/databases/${activeDb}/catalog/verify`)
+    const k = getStoredKey()
+    fetch(`/api/v1/databases/${activeDb}/catalog/verify`, {
+      headers: k ? { Authorization: `Bearer ${k}` } : {},
+    })
       .then((r) => r.json())
       .then((b) => setDrift(b.data?.drift ?? false))
       .catch(() => setDrift(false))

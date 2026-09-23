@@ -72,30 +72,22 @@ export const api = {
       body: JSON.stringify(body),
     }),
   deleteSaved: (db: string, id: string) =>
-    fetch(`/api/v1/databases/${db}/queries/saved/${id}`, { method: 'DELETE' }).then((res) => {
-      if (!res.ok) throw new Error(`HTTP ${res.status}`)
-    }),
+    req<void>(`/databases/${db}/queries/saved/${id}`, { method: 'DELETE' }),
   pinHistory: (db: string, id: string, pinned: boolean) =>
     req<{ pinned: boolean }>(`/databases/${db}/queries/history/${id}/pin`, { method: 'PATCH', body: JSON.stringify({ pinned }) }),
   pruneHistory: (db: string, maxAgeDays?: number) =>
     req<{ deleted: number }>(`/databases/${db}/queries/history/prune`, { method: 'POST', body: JSON.stringify({ maxAgeDays }) }),
   dropColumn: (db: string, table: string, column: string, confirm: string) =>
-    fetch(`/api/v1/databases/${db}/tables/${table}/columns/${column}?confirm=${encodeURIComponent(confirm)}`, { method: 'DELETE' }).then((res) => {
-      if (!res.ok) return res.json().then((b: IApiEnvelope<unknown>) => Promise.reject(new Error(b.error ?? `HTTP ${res.status}`)))
-    }),
+    req<void>(`/databases/${db}/tables/${table}/columns/${column}?confirm=${encodeURIComponent(confirm)}`, { method: 'DELETE' }),
   dropTable: (db: string, table: string, confirm: string) =>
-    fetch(`/api/v1/databases/${db}/tables/${table}?confirm=${encodeURIComponent(confirm)}`, { method: 'DELETE' }).then((res) => {
-      if (!res.ok) return res.json().then((b: IApiEnvelope<unknown>) => Promise.reject(new Error(b.error ?? `HTTP ${res.status}`)))
-    }),
+    req<void>(`/databases/${db}/tables/${table}?confirm=${encodeURIComponent(confirm)}`, { method: 'DELETE' }),
   renameTable: (db: string, table: string, newName: string) =>
     req<{ renamedTo: string }>(`/databases/${db}/tables/${table}`, { method: 'PATCH', body: JSON.stringify({ newName }) }),
   listIndexes: (db: string) => req<IIndex[]>(`/databases/${db}/indexes`),
   createIndex: (db: string, spec: { name: string; table: string; columns: string[]; unique: boolean }) =>
     req<{ name: string }>(`/databases/${db}/indexes`, { method: 'POST', body: JSON.stringify(spec) }),
   dropIndex: (db: string, name: string) =>
-    fetch(`/api/v1/databases/${db}/indexes/${name}`, { method: 'DELETE' }).then((res) => {
-      if (!res.ok) return res.json().then((b: IApiEnvelope<unknown>) => Promise.reject(new Error(b.error ?? `HTTP ${res.status}`)))
-    }),
+    req<void>(`/databases/${db}/indexes/${name}`, { method: 'DELETE' }),
   explain: (db: string, sql: string) =>
     req<IExplainNode[]>(`/databases/${db}/explain`, { method: 'POST', body: JSON.stringify({ sql }) }),
   importCSV: (db: string, table: string, spec: IImportSpec) =>

@@ -8,6 +8,7 @@ import { SchemaBuilderDialog } from './components/organism/schema/SchemaBuilderD
 import { useSchemaBuilderHooks } from './hooks/page/schema/useSchemaBuilderHooks'
 import type { ITable } from './interface/api.interface'
 import { useAerisStore } from './store/aeris.store'
+import { getStoredKey, setStoredKey } from './utils/auth-storage.util'
 import { useExplorerStore } from './store/global-states/explorer.store'
 
 function App() {
@@ -21,7 +22,7 @@ function App() {
 
   // First-run: offer bootstrap key creation when 401 + no stored key
   useEffect(() => {
-    if (error?.includes('ERR_AUTH_REQUIRED') && !localStorage.getItem('aeris_api_key')) {
+    if (error?.includes('ERR_AUTH_REQUIRED') && !getStoredKey()) {
       const name = window.prompt('First run — create API key. Name:')
       if (name) {
         fetch('/api/v1/auth/bootstrap', {
@@ -32,7 +33,7 @@ function App() {
           .then((r) => r.json())
           .then((b) => {
             if (b.data?.key) {
-              localStorage.setItem('aeris_api_key', b.data.key)
+              setStoredKey(b.data.key)
               refreshDatabases()
             }
           })
