@@ -88,6 +88,7 @@ function App() {
 
       <footer className="border-t border-border bg-panel px-3 py-1 text-xs text-muted">
         {activeDb ? `db: ${activeDb}` : 'no database'} · {schema.length} object(s)
+        {result && ` · ${result.rows?.length ?? 0} rows · ${result.durationMs.toFixed(1)}ms`}
       </footer>
       <SchemaBuilderDialog />
     </div>
