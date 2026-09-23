@@ -92,6 +92,38 @@ export function useDataGridHooks(result: IQueryResult | null) {
     scroll()
   }, [scroll])
 
+  const onKeyDown = useCallback((e: React.KeyboardEvent) => {
+    const el = containerRef.current
+    if (!el) return
+    const step = GRID_ROW_HEIGHT
+    switch (e.key) {
+      case 'ArrowDown':
+        el.scrollTop += step
+        e.preventDefault()
+        break
+      case 'ArrowUp':
+        el.scrollTop -= step
+        e.preventDefault()
+        break
+      case 'PageDown':
+        el.scrollTop += viewportHeight
+        e.preventDefault()
+        break
+      case 'PageUp':
+        el.scrollTop -= viewportHeight
+        e.preventDefault()
+        break
+      case 'Home':
+        el.scrollTop = 0
+        e.preventDefault()
+        break
+      case 'End':
+        el.scrollTop = totalHeight
+        e.preventDefault()
+        break
+    }
+  }, [viewportHeight, totalHeight])
+
   return {
     sortRules,
     filterRules,
@@ -106,6 +138,7 @@ export function useDataGridHooks(result: IQueryResult | null) {
     onSort,
     onExport,
     onScroll,
+    onKeyDown,
     containerRef,
     reset,
   }

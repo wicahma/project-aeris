@@ -52,7 +52,9 @@ export function DataGrid({ result }: { result: IQueryResult }) {
         <div
           ref={grid.containerRef}
           onScroll={grid.onScroll}
-          className="flex-1 overflow-auto"
+          onKeyDown={grid.onKeyDown}
+          tabIndex={0}
+          className="flex-1 overflow-auto focus:outline-none"
           style={{ height: '100%' }}
         >
           <div style={{ height: grid.totalHeight, position: 'relative' }}>
