@@ -73,10 +73,76 @@ function MigrationList() {
   )
 }
 
+function APIKeyList() {
+  const [keys, setKeys] = useState<Array<{ id: number; name: string; createdAt: string; expiresAt?: string }>>([])
+  const [newKey, setNewKey] = useState<{ name: string; key: string } | null>(null)
+  const [loading, setLoading] = useState(false)
+  const { activeDb } = useAerisStore()
+
+  const load = () => {
+    if (!activeDb) return
+    setLoading(true)
+    fetch(`/api/v1/databases/${activeDb}/auth/keys`)
+      .then((r) => r.json())
+      .then((b) => setKeys(b.data ?? []))
+      .catch(() => setKeys([]))
+      .finally(() => setLoading(false))
+  }
+
+  useEffect(load, [activeDb])
+
+  const createKey = () => {
+    const name = prompt('Key name:')
+    if (!name || !activeDb) return
+    fetch(`/api/v1/databases/${activeDb}/auth/keys`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name }),
+    })
+      .then((r) => r.json())
+      .then((b) => {
+        setNewKey({ name, key: b.data.key })
+        load()
+      })
+  }
+
+  const deleteKey = (id: number) => {
+    if (!activeDb || !confirm('Delete this key?')) return
+    fetch(`/api/v1/databases/${activeDb}/auth/keys/${id}`, { method: 'DELETE' }).then(load)
+  }
+
+  if (loading) return <div className="px-2 py-2 text-xs text-muted">Loading…</div>
+
+  return (
+    <div className="text-xs">
+      <div className="flex items-center justify-between border-b border-border px-2 py-1">
+        <span className="text-muted">API Keys</span>
+        <button onClick={createKey} className="text-accent hover:underline">New</button>
+      </div>
+      {newKey && (
+        <div className="border-b border-border bg-canvas px-2 py-1">
+          <div className="text-muted">New key (copy now, won't show again):</div>
+          <code className="block break-all rounded bg-panel p-1 font-mono text-xs">{newKey.key}</code>
+          <button onClick={() => setNewKey(null)} className="mt-1 text-muted hover:text-text">Dismiss</button>
+        </div>
+      )}
+      {keys.length === 0 && <div className="px-2 py-2 text-muted">No API keys.</div>}
+      {keys.map((k) => (
+        <div key={k.id} className="flex items-center gap-2 border-b border-border px-2 py-1 hover:bg-hover">
+          <span className="flex-1 truncate">{k.name}</span>
+          <span className="shrink-0 text-muted">{k.createdAt.slice(0, 10)}</span>
+          {k.expiresAt && <span className="shrink-0 text-muted">exp {k.expiresAt.slice(0, 10)}</span>}
+          <button onClick={() => deleteKey(k.id)} className="shrink-0 text-error hover:underline">Del</button>
+        </div>
+      ))}
+    </div>
+  )
+}
+
 export function HistoryPanel() {
   const { entries, saved, filters, loading, error, activeDb, promptOpen, activeSql, reuseSql, setPromptOpen, onFilter, onSave, onDeleteSaved, onTogglePin, onPrune } =
     useHistoryPanelHooks()
-  const [tab, setTab] = useState<'history' | 'saved' | 'migrations'>('history')
+  const [tab, setTab] = useState<'history' | 'saved' | 'migrations' | 'keys'>('history')
   const [title, setTitle] = useState('')
   const [category, setCategory] = useState('')
 
@@ -102,6 +168,12 @@ export function HistoryPanel() {
           className={`text-xs ${tab === 'migrations' ? 'font-semibold text-text' : 'text-muted'}`}
         >
           Migrations
+        </button>
+        <button
+          onClick={() => setTab('keys')}
+          className={`text-xs ${tab === 'keys' ? 'font-semibold text-text' : 'text-muted'}`}
+        >
+          Keys
         </button>
         <div className="ml-auto flex items-center gap-1">
           {tab === 'history' && (
@@ -172,6 +244,7 @@ export function HistoryPanel() {
           <div className="px-2 py-2 text-xs text-muted">No saved queries.</div>
         )}
         {tab === 'migrations' && <MigrationList />}
+        {tab === 'keys' && <APIKeyList />}
       </div>
 
       {promptOpen && (
