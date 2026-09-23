@@ -1,7 +1,20 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import type { ITable } from '../../interface/api.interface'
 import { api } from '../../services/database/api.service'
 import { useAerisStore } from '../../store/aeris.store'
+
+function useCatalogDrift() {
+  const { activeDb } = useAerisStore()
+  const [drift, setDrift] = useState(false)
+  useEffect(() => {
+    if (!activeDb) return
+    fetch(`/api/v1/databases/${activeDb}/catalog/verify`)
+      .then((r) => r.json())
+      .then((b) => setDrift(b.data?.drift ?? false))
+      .catch(() => setDrift(false))
+  }, [activeDb])
+  return drift
+}
 
 function TableRow({ t, onSelect }: { t: ITable; onSelect: (t: ITable) => void }) {
   const { activeDb, selectDb } = useAerisStore()
@@ -109,6 +122,9 @@ function TableRow({ t, onSelect }: { t: ITable; onSelect: (t: ITable) => void })
           className="flex-1 rounded-control px-2 py-1 text-left text-text hover:bg-hover"
         >
           {t.name}
+          {t.columns.some((c) => c.primaryKey) && (
+            <span className="ml-1 text-[10px] text-muted" title="Has primary key">🔑</span>
+          )}
         </button>
         <button
           onClick={() => setMenu((m) => !m)}
@@ -136,12 +152,18 @@ function TableRow({ t, onSelect }: { t: ITable; onSelect: (t: ITable) => void })
 }
 
 export function ObjectTree({ tables, onSelect }: { tables: ITable[]; onSelect: (t: ITable) => void }) {
+  const drift = useCatalogDrift()
   const groups = [
     { label: 'Tables', items: tables.filter((t) => t.type === 'table') },
     { label: 'Views', items: tables.filter((t) => t.type === 'view') },
   ]
   return (
     <nav aria-label="Object navigator" className="text-sm">
+      {drift && (
+        <div className="mb-1 rounded-control border border-warning bg-warning/10 px-2 py-1 text-xs text-warning" role="alert">
+          Catalog drift detected — run reconcile
+        </div>
+      )}
       {groups.map((g) => (
         <details key={g.label} open className="mb-1">
           <summary className="cursor-pointer select-none px-2 py-1 text-muted hover:text-text">
