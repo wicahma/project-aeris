@@ -116,6 +116,15 @@ func (d *Database) DeleteAPIKey(id int64) error {
 	return nil
 }
 
+func (d *Database) HasAPIKeys() (bool, error) {
+	var n int
+	row := d.db.QueryRow(`SELECT COUNT(*) FROM _system_api_keys`)
+	if err := row.Scan(&n); err != nil {
+		return false, err
+	}
+	return n > 0, nil
+}
+
 func (d *Database) initAPIKeys() error {
 	_, err := d.db.Exec(`CREATE TABLE IF NOT EXISTS _system_api_keys (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,

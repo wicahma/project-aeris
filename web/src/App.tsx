@@ -19,6 +19,27 @@ function App() {
     refreshDatabases()
   }, [refreshDatabases])
 
+  // First-run: offer bootstrap key creation when 401 + no stored key
+  useEffect(() => {
+    if (error?.includes('ERR_AUTH_REQUIRED') && !localStorage.getItem('aeris_api_key')) {
+      const name = window.prompt('First run — create API key. Name:')
+      if (name) {
+        fetch('/api/v1/auth/bootstrap', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name }),
+        })
+          .then((r) => r.json())
+          .then((b) => {
+            if (b.data?.key) {
+              localStorage.setItem('aeris_api_key', b.data.key)
+              refreshDatabases()
+            }
+          })
+      }
+    }
+  }, [error, refreshDatabases])
+
   const onSelectTable = (t: ITable) => {
     if (activeDb) void openTable(activeDb, t.name)
   }

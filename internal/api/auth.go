@@ -63,3 +63,43 @@ func (s *Server) handleDeleteAPIKey(w http.ResponseWriter, r *http.Request) {
 	}
 	w.WriteHeader(http.StatusNoContent)
 }
+
+// Bootstrap: create first API key without auth when zero keys exist.
+// Only works on first run — after that, auth required for key management.
+func (s *Server) handleBootstrapKey(w http.ResponseWriter, r *http.Request) {
+	// Use first attached DB (bootstrap assumes at least one exists)
+	names := s.mgr.List()
+	if len(names) == 0 {
+		writeErr(w, http.StatusBadRequest, errString("ERR_NO_DATABASE: attach a database first"))
+		return
+	}
+	db, ok := s.mgr.Get(names[0])
+	if !ok {
+		writeErr(w, http.StatusInternalServerError, errString("ERR_INTERNAL"))
+		return
+	}
+
+	has, err := db.HasAPIKeys()
+	if err != nil {
+		writeErr(w, http.StatusInternalServerError, err)
+		return
+	}
+	if has {
+		writeErr(w, http.StatusForbidden, errString("ERR_BOOTSTRAP_CLOSED: API keys already exist"))
+		return
+	}
+
+	var req createKeyRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		writeErr(w, http.StatusBadRequest, err)
+		return
+	}
+	key, raw, err := db.CreateAPIKey(req.Name, req.ExpiresInDays)
+	if err != nil {
+		writeErr(w, http.StatusBadRequest, err)
+		return
+	}
+	writeJSON(w, http.StatusCreated, envelope{Data: map[string]any{
+		"id": key.ID, "name": key.Name, "key": raw, "createdAt": key.CreatedAt,
+	}})
+}

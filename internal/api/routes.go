@@ -9,6 +9,7 @@ func (s *Server) Routes() http.Handler {
 	mux.HandleFunc("POST /api/v1/auth/keys", s.handleCreateAPIKey)
 	mux.HandleFunc("GET /api/v1/auth/keys", s.handleListAPIKeys)
 	mux.HandleFunc("DELETE /api/v1/auth/keys/{id}", s.handleDeleteAPIKey)
+	mux.HandleFunc("POST /api/v1/auth/bootstrap", s.handleBootstrapKey)
 	mux.HandleFunc("POST /api/v1/databases/{db}/auth/keys", s.handleCreateAPIKey)
 	mux.HandleFunc("GET /api/v1/databases/{db}/auth/keys", s.handleListAPIKeys)
 	mux.HandleFunc("DELETE /api/v1/databases/{db}/auth/keys/{id}", s.handleDeleteAPIKey)
